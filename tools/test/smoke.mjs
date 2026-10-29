@@ -420,7 +420,44 @@ async function main() {
   check("export does not throw", (await page.evaluate(() => window.__unifier.env.w > 0)) === true);
   void beforeExport.hash;
 
-  console.log("\n11. Speech synthesis path");
+  console.log("\n11. Video recording (MP4)");
+  const fmt = await page.evaluate(() => ({
+    chosen: window.__unifier.pickRecordFormat(),
+    ext: window.__unifier.extFor(window.__unifier.pickRecordFormat() || ""),
+  }));
+  check("a recording format is available", typeof fmt.chosen === "string" && fmt.chosen.length > 0, fmt.chosen || "(none)");
+  check("MP4 is preferred when the browser can mux it", fmt.ext === "mp4", fmt.chosen);
+
+  /* record for real: drive the demo, capture ~1.5s, then inspect the file */
+  await page.evaluate(() => {
+    window.__rec = { blob: null, name: null };
+    const real = URL.createObjectURL.bind(URL);
+    URL.createObjectURL = (o) => { if (o instanceof Blob) window.__rec.blob = o; return real(o); };
+    HTMLAnchorElement.prototype.click = function () { window.__rec.name = this.download; };
+  });
+  await page.evaluate(() => window.__unifier.unifier.demo());
+  await sleep(500);
+  await page.click("#btn-rec");
+  await sleep(1500);
+  await page.click("#btn-rec");
+  await sleep(1200);
+
+  const rec = await page.evaluate(async () => {
+    const blob = window.__rec.blob;
+    if (!blob) return { ok: false };
+    const buf = new Uint8Array(await blob.arrayBuffer());
+    /* ISO-BMFF files carry an 'ftyp' box at offset 4 and the brand at 8..12 */
+    const tag = String.fromCharCode(...buf.slice(4, 8));
+    const brand = String.fromCharCode(...buf.slice(8, 12));
+    return { ok: true, type: blob.type, size: blob.size, tag, brand, name: window.__rec.name, header: [...buf.slice(0, 4)].join(",") };
+  });
+  check("recording produces a file", rec.ok && rec.size > 0, rec.ok ? (rec.size / 1024).toFixed(0) + " KB" : "no blob");
+  check("recording is MP4 (ftyp box present)", rec.tag === "ftyp", rec.tag || "-");
+  check("MP4 brand is a known video brand", /^(isom|iso[0-9]|mp4[12]|avc1|dash|MSNV|iso6)/.test(rec.brand || ""), rec.brand || "-");
+  check("recording filename ends in .mp4", /\.mp4$/.test(rec.name || ""), rec.name || "-");
+  check("recording has real content", rec.size > 5000, (rec.size / 1024).toFixed(0) + " KB");
+
+  console.log("\n12. Speech synthesis path");
   await page.evaluate(() => {
     document.getElementById("tab-speech").click();
     window.__unifier.unifier.ttsDrive();
@@ -433,7 +470,7 @@ async function main() {
   const ttsStatus = await page.$eval("#speech-note", (e) => e.textContent);
   check("TTS reports a status", /Berbicara|Selesai|tidak didukung|gagal/i.test(ttsStatus), ttsStatus);
 
-  console.log("\n12. Microphone path with a fake device");
+  console.log("\n13. Microphone path with a fake device");
   await page.evaluate(() => document.getElementById("tab-audio").click());
   await page.click("#btn-mic");
   await sleep(2500);
@@ -446,7 +483,7 @@ async function main() {
   const meter = await page.$eval("#meter-label", (e) => e.textContent);
   check("dB meter is populated", /dB/.test(meter), meter);
 
-  console.log("\n13. Oscillator generator");
+  console.log("\n14. Oscillator generator");
   await page.click("#btn-mic"); // release the device first
   await sleep(300);
   await page.click("#btn-osc");
@@ -458,7 +495,7 @@ async function main() {
   const stopped = await page.evaluate(() => window.__unifier.unifier.mode);
   check("stopping the oscillator returns to idle", stopped === "idle", "mode=" + stopped);
 
-  console.log("\n14. URL state round-trip");
+  console.log("\n15. URL state round-trip");
   await page.evaluate(() => {
     window.__unifier.setMode("tunnel", false);
     window.__unifier.setPalette("ion");
@@ -484,7 +521,7 @@ async function main() {
   check("URL restores numeric control", Math.abs(restored.complexity - 1.75) < 1e-6, String(restored.complexity));
   check("URL restores boolean toggle", restored.glow === false, String(restored.glow));
 
-  console.log("\n15. Theme + share");
+  console.log("\n16. Theme + share");
   await page.click("#btn-theme");
   const theme = await page.evaluate(() => document.documentElement.getAttribute("data-theme"));
   check("theme toggles to light", theme === "light", theme);
@@ -495,7 +532,7 @@ async function main() {
   if (SHOTS) await page.screenshot({ path: join(OUT, "theme-light.png"), fullPage: false });
   await page.click("#btn-theme");
 
-  console.log("\n16. Layout + accessibility invariants");
+  console.log("\n17. Layout + accessibility invariants");
   const layout = await page.evaluate(() => {
     const stage = document.getElementById("stage-wrap").getBoundingClientRect();
     const cs = getComputedStyle(document.body);
@@ -566,7 +603,7 @@ async function main() {
   if (SHOTS) await page.screenshot({ path: join(OUT, "narrow.png"), fullPage: false });
   await page.setViewport({ width: 1440, height: 1000 });
 
-  console.log("\n17. Reduced motion is honoured");
+  console.log("\n18. Reduced motion is honoured");
   await page.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
   await page.reload({ waitUntil: "networkidle0" });
   await page.waitForFunction(() => !!window.__unifier, { timeout: 10_000 });
@@ -575,7 +612,7 @@ async function main() {
   const engineLabel = await page.$eval("#engine-label", (e) => e.textContent);
   check("reduced-motion is surfaced in the HUD", /reduced-motion/.test(engineLabel), engineLabel);
 
-  console.log("\n18. Single-file build is self-contained");
+  console.log("\n19. Single-file build is self-contained");
   const distHtml = await readFile(join(ROOT, "dist/unifier.html"), "utf8");
   check("dist has no external css link", !/rel="stylesheet" href="(?!data:)/.test(distHtml));
   check("dist has no external script src", !/<script src="/.test(distHtml));
@@ -594,7 +631,7 @@ async function main() {
   check("dist build has no console errors", distErrors.length === 0, distErrors.slice(0, 2).join(" | "));
   await page2.close();
 
-  console.log("\n19. Meta + generated files");
+  console.log("\n20. Meta + generated files");
   const meta = await page.evaluate(() => ({
     title: document.title,
     desc: document.querySelector('meta[name="description"]')?.content || "",
@@ -614,7 +651,7 @@ async function main() {
   const robots = await readFile(join(ROOT, "robots.txt"), "utf8");
   check("robots.txt points at the sitemap", robots.includes("sitemap.xml"));
 
-  console.log("\n20. Anchor links resolve");
+  console.log("\n21. Anchor links resolve");
   const deadAnchors = await page.evaluate(() => {
     const ids = new Set([...document.querySelectorAll("[id]")].map((e) => e.id));
     return [...document.querySelectorAll('a[href^="#"]')]
@@ -627,6 +664,21 @@ async function main() {
     return getComputedStyle(el).scrollMarginTop;
   });
   check("anchors clear the sticky header", scrollMargin !== "0px" && scrollMargin !== "", scrollMargin);
+
+  console.log("\n22. README images resolve");
+  const readme = await readFile(join(ROOT, "README.md"), "utf8");
+  const imgSrcs = [...readme.matchAll(/<img[^>]+src="([^"]+)"/g)].map((m) => m[1])
+    .filter((u) => !/^https?:/.test(u));
+  check("README embeds at least one image", imgSrcs.length > 0, imgSrcs.length + " images");
+  const missing = [];
+  for (const rel of imgSrcs) {
+    try { await readFile(join(ROOT, rel)); } catch { missing.push(rel); }
+  }
+  check("every README image exists on disk", missing.length === 0, missing.join(", ") || "all present");
+  /* docs/ is committed, so the images must be small enough to live in the repo */
+  let imgBytes = 0;
+  for (const rel of imgSrcs) { try { imgBytes += (await readFile(join(ROOT, rel))).length; } catch { /* counted as missing */ } }
+  check("README images stay lightweight (< 600 KB total)", imgBytes < 600 * 1024, (imgBytes / 1024).toFixed(0) + " KB");
 
   check("no console errors across the whole run", errors.length === 0, errors.slice(0, 4).join(" | "));
 

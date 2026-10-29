@@ -133,6 +133,32 @@ def icon(size: int) -> Image.Image:
     return img
 
 
+def optimise_shots() -> None:
+    """Downscale .agent_tmp/shots/*.png into docs/ for the README.
+
+    The raw shots are full-resolution and run to ~1.5 MB each, which is far too
+    heavy to commit. PNG barely compresses these (smooth gradients, dark UI) —
+    quantising to 256 colours saves under 20% while visibly banding the
+    gradients. WebP handles this content far better: the whole gallery lands
+    under 200 KB at an RMSE of ~2/255, which is not perceptible.
+    """
+    src = ROOT / ".agent_tmp/shots"
+    if not src.is_dir():
+        print("  (no .agent_tmp/shots; run tools/make-shots.mjs first)")
+        return
+    out = ROOT / "docs"
+    out.mkdir(parents=True, exist_ok=True)
+    for p in sorted(src.glob("*.png")):
+        im = Image.open(p).convert("RGB")
+        # mode shots are 1920x1080 exports; UI shots are 1440x900 screenshots
+        target = 1200 if p.stem.startswith("mode-") else 1280
+        if im.width > target:
+            im = im.resize((target, round(im.height * target / im.width)), Image.LANCZOS)
+        dest = out / (p.stem + ".webp")
+        im.save(dest, "WEBP", quality=90, method=6)
+        print(f"  wrote docs/{dest.name}  {im.size}  {dest.stat().st_size // 1024} KB")
+
+
 def main() -> None:
     ASSETS.mkdir(parents=True, exist_ok=True)
     card = social_card()
@@ -142,6 +168,7 @@ def main() -> None:
         ic = icon(s)
         ic.save(ASSETS / f"icon-{s}.png", "PNG", optimize=True)
         print(f"  wrote assets/icon-{s}.png  {ic.size}")
+    optimise_shots()
     print("done")
 
 
