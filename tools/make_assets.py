@@ -109,7 +109,7 @@ def social_card() -> Image.Image:
 
     # footer strip
     d.line((96, 548, W - 96, 548), fill=(255, 255, 255, 30), width=1)
-    d.text((96, 566), "antono4.github.io/VisualisasiSuaraReal-timeUnifier", font=font(22), fill=DIM)
+    d.text((96, 566), "antono4.github.io/Unifier", font=font(22), fill=DIM)
     d.text((W - 96 - 250, 566), "Canvas 2D · tanpa dependensi", font=font(22), fill=(110, 125, 150))
     return img.convert("RGB")
 

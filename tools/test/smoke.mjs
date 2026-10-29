@@ -359,7 +359,68 @@ async function main() {
   await sleep(400);
   check("disconnect is honoured", (await page.evaluate(() => window.__unifier.live.connected)) === false);
 
-  console.log("\n10. Speech synthesis path");
+  console.log("\n10. Still export (download)");
+  /* capture the generated blob without letting Chromium actually download it */
+  await page.evaluate(() => {
+    window.__dl = [];
+    const realCreate = URL.createObjectURL.bind(URL);
+    URL.createObjectURL = (obj) => {
+      if (obj instanceof Blob) window.__dl.push(obj);
+      return realCreate(obj);
+    };
+    HTMLAnchorElement.prototype.click = function () { window.__dlName = this.download; };
+  });
+
+  /* the export must not disturb the live stage, so snapshot it first */
+  const beforeExport = await page.evaluate(() => {
+    const c = document.getElementById("stage-canvas");
+    return { w: c.width, h: c.height, hash: c.toDataURL().slice(-64) };
+  });
+
+  for (const mode of ["bars", "unified"]) {
+    await page.evaluate((m) => window.__unifier.setMode(m, false), mode);
+    await sleep(400);
+    await page.click("#btn-png");
+    await sleep(700);
+    const got = await page.evaluate(async () => {
+      const blob = window.__dl[window.__dl.length - 1];
+      if (!blob) return { ok: false };
+      const buf = new Uint8Array(await blob.arrayBuffer());
+      /* PNG: 8 magic bytes, 4 chunk length, 4 chunk type, then IHDR
+         width at 16..19 and height at 20..23, both big-endian */
+      const magic = [...buf.slice(0, 8)].join(",");
+      const dv = new DataView(buf.buffer);
+      return {
+        ok: true,
+        type: blob.type,
+        size: blob.size,
+        magic,
+        width: dv.getUint32(16),
+        height: dv.getUint32(20),
+        name: window.__dlName,
+      };
+    });
+    check(`export produces a PNG (${mode})`, got.ok && got.type === "image/png", got.type || "no blob");
+    check(`PNG magic bytes are valid (${mode})`,
+      got.magic === "137,80,78,71,13,10,26,10", got.magic || "-");
+    check(`export is 1920x1080 regardless of window size (${mode})`,
+      got.width === 1920 && got.height === 1080, `${got.width}x${got.height}`);
+    check(`export has real content, not a blank frame (${mode})`, got.size > 20000, (got.size / 1024).toFixed(0) + " KB");
+    check(`filename names mode + size (${mode})`,
+      new RegExp(`^unifier-${mode}-[a-z]+-1920x1080\\.png$`).test(got.name || ""), got.name || "-");
+  }
+
+  const afterExport = await page.evaluate(() => {
+    const c = document.getElementById("stage-canvas");
+    return { w: c.width, h: c.height };
+  });
+  check("export leaves the live canvas untouched",
+    afterExport.w === beforeExport.w && afterExport.h === beforeExport.h,
+    `${beforeExport.w}x${beforeExport.h} -> ${afterExport.w}x${afterExport.h}`);
+  check("export does not throw", (await page.evaluate(() => window.__unifier.env.w > 0)) === true);
+  void beforeExport.hash;
+
+  console.log("\n11. Speech synthesis path");
   await page.evaluate(() => {
     document.getElementById("tab-speech").click();
     window.__unifier.unifier.ttsDrive();
@@ -372,7 +433,7 @@ async function main() {
   const ttsStatus = await page.$eval("#speech-note", (e) => e.textContent);
   check("TTS reports a status", /Berbicara|Selesai|tidak didukung|gagal/i.test(ttsStatus), ttsStatus);
 
-  console.log("\n11. Microphone path with a fake device");
+  console.log("\n12. Microphone path with a fake device");
   await page.evaluate(() => document.getElementById("tab-audio").click());
   await page.click("#btn-mic");
   await sleep(2500);
@@ -385,7 +446,7 @@ async function main() {
   const meter = await page.$eval("#meter-label", (e) => e.textContent);
   check("dB meter is populated", /dB/.test(meter), meter);
 
-  console.log("\n12. Oscillator generator");
+  console.log("\n13. Oscillator generator");
   await page.click("#btn-mic"); // release the device first
   await sleep(300);
   await page.click("#btn-osc");
@@ -397,7 +458,7 @@ async function main() {
   const stopped = await page.evaluate(() => window.__unifier.unifier.mode);
   check("stopping the oscillator returns to idle", stopped === "idle", "mode=" + stopped);
 
-  console.log("\n13. URL state round-trip");
+  console.log("\n14. URL state round-trip");
   await page.evaluate(() => {
     window.__unifier.setMode("tunnel", false);
     window.__unifier.setPalette("ion");
@@ -423,7 +484,7 @@ async function main() {
   check("URL restores numeric control", Math.abs(restored.complexity - 1.75) < 1e-6, String(restored.complexity));
   check("URL restores boolean toggle", restored.glow === false, String(restored.glow));
 
-  console.log("\n14. Theme + share");
+  console.log("\n15. Theme + share");
   await page.click("#btn-theme");
   const theme = await page.evaluate(() => document.documentElement.getAttribute("data-theme"));
   check("theme toggles to light", theme === "light", theme);
@@ -434,7 +495,7 @@ async function main() {
   if (SHOTS) await page.screenshot({ path: join(OUT, "theme-light.png"), fullPage: false });
   await page.click("#btn-theme");
 
-  console.log("\n15. Layout + accessibility invariants");
+  console.log("\n16. Layout + accessibility invariants");
   const layout = await page.evaluate(() => {
     const stage = document.getElementById("stage-wrap").getBoundingClientRect();
     const cs = getComputedStyle(document.body);
@@ -490,10 +551,22 @@ async function main() {
   await sleep(600);
   const narrow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   check("no horizontal overflow at 390px", narrow <= 1, narrow + "px");
+  /* the stage bar packs readouts next to the export button; at this width the
+     button must still be reachable and not pushed past the bar's edge */
+  const barFit = await page.evaluate(() => {
+    const bar = document.querySelector(".stage-bar");
+    const btn = document.getElementById("btn-png");
+    const br = btn.getBoundingClientRect();
+    const sr = bar.getBoundingClientRect();
+    return { visible: br.width > 0 && br.height > 0, inside: br.right <= sr.right + 1, barOver: bar.scrollWidth - bar.clientWidth };
+  });
+  check("export button stays reachable at 390px",
+    barFit.visible && barFit.inside && barFit.barOver <= 1,
+    JSON.stringify(barFit));
   if (SHOTS) await page.screenshot({ path: join(OUT, "narrow.png"), fullPage: false });
   await page.setViewport({ width: 1440, height: 1000 });
 
-  console.log("\n16. Reduced motion is honoured");
+  console.log("\n17. Reduced motion is honoured");
   await page.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
   await page.reload({ waitUntil: "networkidle0" });
   await page.waitForFunction(() => !!window.__unifier, { timeout: 10_000 });
@@ -502,7 +575,7 @@ async function main() {
   const engineLabel = await page.$eval("#engine-label", (e) => e.textContent);
   check("reduced-motion is surfaced in the HUD", /reduced-motion/.test(engineLabel), engineLabel);
 
-  console.log("\n17. Single-file build is self-contained");
+  console.log("\n18. Single-file build is self-contained");
   const distHtml = await readFile(join(ROOT, "dist/unifier.html"), "utf8");
   check("dist has no external css link", !/rel="stylesheet" href="(?!data:)/.test(distHtml));
   check("dist has no external script src", !/<script src="/.test(distHtml));
@@ -521,7 +594,7 @@ async function main() {
   check("dist build has no console errors", distErrors.length === 0, distErrors.slice(0, 2).join(" | "));
   await page2.close();
 
-  console.log("\n18. Meta + generated files");
+  console.log("\n19. Meta + generated files");
   const meta = await page.evaluate(() => ({
     title: document.title,
     desc: document.querySelector('meta[name="description"]')?.content || "",
@@ -532,7 +605,7 @@ async function main() {
   check("title is set", meta.title.includes("Unifier"), meta.title);
   check("description is set", meta.desc.length > 40);
   check("og:image is set", meta.og.endsWith("social-card.png"));
-  check("canonical is set", meta.canonical.includes("VisualisasiSuaraReal-timeUnifier"));
+  check("canonical is set", meta.canonical.includes("Unifier"));
   check("favicon is set", meta.icon.includes("favicon.svg"));
   for (const f of ["robots.txt", "sitemap.xml", "manifest.webmanifest"]) {
     const body = await readFile(join(ROOT, f), "utf8");
@@ -541,7 +614,7 @@ async function main() {
   const robots = await readFile(join(ROOT, "robots.txt"), "utf8");
   check("robots.txt points at the sitemap", robots.includes("sitemap.xml"));
 
-  console.log("\n19. Anchor links resolve");
+  console.log("\n20. Anchor links resolve");
   const deadAnchors = await page.evaluate(() => {
     const ids = new Set([...document.querySelectorAll("[id]")].map((e) => e.id));
     return [...document.querySelectorAll('a[href^="#"]')]

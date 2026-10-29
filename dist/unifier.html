@@ -7,18 +7,18 @@
 <meta name="description" content="Eksperimen Unifier: sistem visualisasi suara buatan sendiri yang mengubah audio, ucapan, dan sinyal agen AI menjadi efek visual real-time di browser.">
 <meta name="theme-color" content="#070b14">
 <meta name="color-scheme" content="dark light">
-<link rel="canonical" href="https://antono4.github.io/VisualisasiSuaraReal-timeUnifier/">
+<link rel="canonical" href="https://antono4.github.io/Unifier/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Unifier — Visualisasi Suara Real-time">
 <meta property="og:description" content="Mengubah audio, ucapan, dan sinyal agen AI menjadi efek visual. Mesin visualisasi buatan sendiri, tanpa library.">
-<meta property="og:url" content="https://antono4.github.io/VisualisasiSuaraReal-timeUnifier/">
-<meta property="og:image" content="https://antono4.github.io/VisualisasiSuaraReal-timeUnifier/assets/social-card.png">
+<meta property="og:url" content="https://antono4.github.io/Unifier/">
+<meta property="og:image" content="https://antono4.github.io/Unifier/assets/social-card.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Unifier — Visualisasi Suara Real-time">
 <meta name="twitter:description" content="Audio, ucapan, dan sinyal agen AI menjadi efek visual real-time.">
-<meta name="twitter:image" content="https://antono4.github.io/VisualisasiSuaraReal-timeUnifier/assets/social-card.png">
+<meta name="twitter:image" content="https://antono4.github.io/Unifier/assets/social-card.png">
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwIiB5MT0iMSIgeDI9IjAiIHkyPSIwIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMmRkNGJmIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzYzNjZmMSIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzA3MGIxNCIvPgogIDxnIGZpbGw9InVybCgjZykiPgogICAgPHJlY3QgeD0iNyIgIHk9IjE0IiB3aWR0aD0iMyIgaGVpZ2h0PSI4IiAgcng9IjEuNSIvPgogICAgPHJlY3QgeD0iMTIiIHk9IjgiICB3aWR0aD0iMyIgaGVpZ2h0PSIxNiIgcng9IjEuNSIvPgogICAgPHJlY3QgeD0iMTciIHk9IjExIiB3aWR0aD0iMyIgaGVpZ2h0PSIxMiIgcng9IjEuNSIvPgogICAgPHJlY3QgeD0iMjIiIHk9IjYiICB3aWR0aD0iMyIgaGVpZ2h0PSIxOCIgcng9IjEuNSIvPgogIDwvZz4KPC9zdmc+Cg==" type="image/svg+xml">
-<link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiVW5pZmllciBcdTIwMTQgVmlzdWFsaXNhc2kgU3VhcmEgUmVhbC10aW1lIiwic2hvcnRfbmFtZSI6IlVuaWZpZXIiLCJkZXNjcmlwdGlvbiI6IkVrc3BlcmltZW4gdmlzdWFsaXNhc2kgc3VhcmE6IGF1ZGlvLCB1Y2FwYW4sIGRhbiBzaW55YWwgYWdlbiBBSSBtZW5qYWRpIGVmZWsgdmlzdWFsLiIsInN0YXJ0X3VybCI6Imh0dHBzOi8vYW50b25vNC5naXRodWIuaW8vVmlzdWFsaXNhc2lTdWFyYVJlYWwtdGltZVVuaWZpZXIvIiwic2NvcGUiOiJodHRwczovL2FudG9ubzQuZ2l0aHViLmlvL1Zpc3VhbGlzYXNpU3VhcmFSZWFsLXRpbWVVbmlmaWVyLyIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwNzBiMTQiLCJ0aGVtZV9jb2xvciI6IiMwNzBiMTQiLCJsYW5nIjoiaWQiLCJpY29ucyI6W3sic3JjIjoiaHR0cHM6Ly9hbnRvbm80LmdpdGh1Yi5pby9WaXN1YWxpc2FzaVN1YXJhUmVhbC10aW1lVW5pZmllci9hc3NldHMvZmF2aWNvbi5zdmciLCJzaXplcyI6ImFueSIsInR5cGUiOiJpbWFnZS9zdmcreG1sIiwicHVycG9zZSI6ImFueSBtYXNrYWJsZSJ9XX0=">
+<link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiVW5pZmllciBcdTIwMTQgVmlzdWFsaXNhc2kgU3VhcmEgUmVhbC10aW1lIiwic2hvcnRfbmFtZSI6IlVuaWZpZXIiLCJkZXNjcmlwdGlvbiI6IkVrc3BlcmltZW4gdmlzdWFsaXNhc2kgc3VhcmE6IGF1ZGlvLCB1Y2FwYW4sIGRhbiBzaW55YWwgYWdlbiBBSSBtZW5qYWRpIGVmZWsgdmlzdWFsLiIsInN0YXJ0X3VybCI6Imh0dHBzOi8vYW50b25vNC5naXRodWIuaW8vVW5pZmllci8iLCJzY29wZSI6Imh0dHBzOi8vYW50b25vNC5naXRodWIuaW8vVW5pZmllci8iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjMDcwYjE0IiwidGhlbWVfY29sb3IiOiIjMDcwYjE0IiwibGFuZyI6ImlkIiwiaWNvbnMiOlt7InNyYyI6Imh0dHBzOi8vYW50b25vNC5naXRodWIuaW8vVW5pZmllci9hc3NldHMvZmF2aWNvbi5zdmciLCJzaXplcyI6ImFueSIsInR5cGUiOiJpbWFnZS9zdmcreG1sIiwicHVycG9zZSI6ImFueSBtYXNrYWJsZSJ9XX0=">
 <style>
 /* Unifier — design tokens
    Single source of truth for colour, type, space, motion, depth. */
@@ -267,6 +267,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .btn--ghost:hover:not(:disabled) { color: var(--text); background: var(--panel); }
 .btn--icon { padding: var(--sp-2); width: 38px; height: 38px; border-radius: var(--radius-sm); border-color: var(--line); background: var(--panel); }
 .btn--icon:hover { background: var(--panel-2); }
+.btn--xs { padding: var(--sp-1) var(--sp-2); font-size: var(--t-2xs); border-color: var(--line); }
+.btn--xs svg { width: 0.95em; height: 0.95em; }
 .btn--block { width: 100%; }
 .btn.is-on { border-color: var(--accent); color: var(--accent); }
 .btn.is-rec { border-color: var(--accent-3); color: var(--accent-3); }
@@ -653,6 +655,12 @@ textarea { resize: vertical; font-family: var(--font-mono); font-size: var(--t-x
   #btn-share svg { width: 1.2em; height: 1.2em; }
   #btn-share span, #btn-share .btn__label { display: none; }
   .topbar { gap: var(--sp-3); }
+  /* the stage bar carries three readouts plus an action; drop to icons */
+  .stage-bar { gap: var(--sp-2); }
+  .stage-bar__right { gap: var(--sp-2); }
+  #btn-png { padding: var(--sp-1); }
+  #btn-png .btn__label { display: none; }
+  #engine-label { display: none; }
 }
 
 @media (max-width: 420px) {
@@ -762,6 +770,10 @@ textarea { resize: vertical; font-family: var(--font-mono); font-size: var(--t-x
         <div class="stage-bar__right">
           <span class="mono" id="meter-label">-∞ dB</span>
           <span class="mono dim" id="engine-label">idle</span>
+          <button id="btn-png" class="btn btn--ghost btn--xs" type="button" title="Unduh gambar 1920×1080 dari panggung">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M8 11l4 4 4-4M4 19h16"/></svg>
+            <span class="btn__label">Unduh PNG</span>
+          </button>
         </div>
       </div>
     </div>
@@ -1020,7 +1032,7 @@ textarea { resize: vertical; font-family: var(--font-mono); font-size: var(--t-x
   </div>
   <div class="footer__right">
     <span class="mono dim">Canvas 2D · Web Audio · tanpa dependensi</span>
-    <a href="https://github.com/antono4/VisualisasiSuaraReal-timeUnifier">Sumber</a>
+    <a href="https://github.com/antono4/Unifier">Sumber</a>
   </div>
 </footer>
 
@@ -2985,6 +2997,57 @@ window.UnifierViz = { MODES, PALETTES, makePal, ramp, rgba, drawGrid, drawErrorF
   btnRec.addEventListener("click", toggleRecord);
 
   /* ------------------------------------------------------------------ */
+  /* Still export — re-render the current frame at 1920x1080            */
+  /* ------------------------------------------------------------------ */
+  /* The live canvas is sized to the layout, so it is whatever the window
+     happens to be. Exporting that gives a different image on every screen.
+     Instead the same renderer draws one frame into an offscreen canvas at a
+     fixed size, which also lets the export exceed the visible resolution. */
+  const EXPORT_W = 1920;
+  const EXPORT_H = 1080;
+
+  function exportStill() {
+    const off = document.createElement("canvas");
+    off.width = EXPORT_W;
+    off.height = EXPORT_H;
+    const octx = off.getContext("2d");
+
+    /* swap in a detached environment so the live stage is untouched */
+    const saved = { ctx: env.ctx, canvas: env.canvas, w: env.w, h: env.h, dpr: env.dpr };
+    env.ctx = octx;
+    env.canvas = off;
+    env.w = EXPORT_W;
+    env.h = EXPORT_H;
+    env.dpr = 1;
+
+    /* a freshly built renderer starts from a clean particle ring buffer, so the
+       image is deterministic rather than depending on how long the page ran */
+    const still = new MODES[state.mode](env);
+    const f = unifier.frame;
+
+    try {
+      octx.fillStyle = env.pal.bg;
+      octx.fillRect(0, 0, EXPORT_W, EXPORT_H);
+      still.draw(f);
+      if (state.grid) drawGrid(env);
+      drawErrorFlash(env, f);
+    } finally {
+      Object.assign(env, saved);
+    }
+
+    off.toBlob((blob) => {
+      if (!blob) { toast("Gambar gagal dibuat"); return; }
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `unifier-${state.mode}-${state.palette}-${EXPORT_W}x${EXPORT_H}.png`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      toast(`Gambar diunduh · ${EXPORT_W}×${EXPORT_H}`);
+    }, "image/png");
+  }
+  $("btn-png").addEventListener("click", exportStill);
+
+  /* ------------------------------------------------------------------ */
   /* Demo mode + keyboard                                                */
   /* ------------------------------------------------------------------ */
   function startDemo() {
@@ -3006,6 +3069,7 @@ window.UnifierViz = { MODES, PALETTES, makePal, ramp, rgba, drawGrid, drawErrorF
     else if (k === "d") startDemo();
     else if (k === "f") toggleFullscreen();
     else if (k === "r") toggleRecord();
+    else if (k === "s") exportStill();
     else if (k === "t") setTheme(state.theme === "dark" ? "light" : "dark");
     else if (k === " ") { e.preventDefault(); setMode(MODE_ORDER[(MODE_ORDER.indexOf(state.mode) + 1) % MODE_ORDER.length], true); }
   });
@@ -3053,7 +3117,7 @@ window.UnifierViz = { MODES, PALETTES, makePal, ramp, rgba, drawGrid, drawErrorF
   });
 
   requestAnimationFrame(loop);
-  window.__unifier = { state, unifier, env, setMode, setPalette, setTheme, toast, live, agent, speech, tts };
+  window.__unifier = { state, unifier, env, setMode, setPalette, setTheme, toast, live, agent, speech, tts, exportStill };
 })();
 
 </script>
