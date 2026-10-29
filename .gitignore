@@ -1,0 +1,17 @@
+# dependencies (puppeteer-core is only needed to run the smoke tests)
+node_modules/
+
+# test artifacts
+.agent_tmp/
+
+# editor / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# agent scaffolding (memory, working notes)
+.openhands/
+__pycache__/
+*.pyc
