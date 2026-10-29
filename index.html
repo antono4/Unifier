@@ -7,16 +7,16 @@
 <meta name="description" content="Eksperimen Unifier: sistem visualisasi suara buatan sendiri yang mengubah audio, ucapan, dan sinyal agen AI menjadi efek visual real-time di browser.">
 <meta name="theme-color" content="#070b14">
 <meta name="color-scheme" content="dark light">
-<link rel="canonical" href="https://antono4.github.io/VisualisasiSuaraReal-timeUnifier/">
+<link rel="canonical" href="https://antono4.github.io/Unifier/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Unifier — Visualisasi Suara Real-time">
 <meta property="og:description" content="Mengubah audio, ucapan, dan sinyal agen AI menjadi efek visual. Mesin visualisasi buatan sendiri, tanpa library.">
-<meta property="og:url" content="https://antono4.github.io/VisualisasiSuaraReal-timeUnifier/">
-<meta property="og:image" content="https://antono4.github.io/VisualisasiSuaraReal-timeUnifier/assets/social-card.png">
+<meta property="og:url" content="https://antono4.github.io/Unifier/">
+<meta property="og:image" content="https://antono4.github.io/Unifier/assets/social-card.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Unifier — Visualisasi Suara Real-time">
 <meta name="twitter:description" content="Audio, ucapan, dan sinyal agen AI menjadi efek visual real-time.">
-<meta name="twitter:image" content="https://antono4.github.io/VisualisasiSuaraReal-timeUnifier/assets/social-card.png">
+<meta name="twitter:image" content="https://antono4.github.io/Unifier/assets/social-card.png">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="stylesheet" href="css/tokens.css">
@@ -118,6 +118,10 @@
         <div class="stage-bar__right">
           <span class="mono" id="meter-label">-∞ dB</span>
           <span class="mono dim" id="engine-label">idle</span>
+          <button id="btn-png" class="btn btn--ghost btn--xs" type="button" title="Unduh gambar 1920×1080 dari panggung">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M8 11l4 4 4-4M4 19h16"/></svg>
+            <span class="btn__label">Unduh PNG</span>
+          </button>
         </div>
       </div>
     </div>
@@ -376,7 +380,7 @@
   </div>
   <div class="footer__right">
     <span class="mono dim">Canvas 2D · Web Audio · tanpa dependensi</span>
-    <a href="https://github.com/antono4/VisualisasiSuaraReal-timeUnifier">Sumber</a>
+    <a href="https://github.com/antono4/Unifier">Sumber</a>
   </div>
 </footer>
 

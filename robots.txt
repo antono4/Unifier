@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://antono4.github.io/VisualisasiSuaraReal-timeUnifier/sitemap.xml
+Sitemap: https://antono4.github.io/Unifier/sitemap.xml

@@ -26,8 +26,8 @@ DIST = ROOT / "dist"
 SITE = {
     "name": "Unifier",
     "tagline": "Visualisasi Suara Real-time",
-    "url": "https://antono4.github.io/VisualisasiSuaraReal-timeUnifier/",
-    "repo": "https://github.com/antono4/VisualisasiSuaraReal-timeUnifier",
+    "url": "https://antono4.github.io/Unifier/",
+    "repo": "https://github.com/antono4/Unifier",
     "lang": "id",
     "theme": "#070b14",
 }

@@ -146,6 +146,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .btn--ghost:hover:not(:disabled) { color: var(--text); background: var(--panel); }
 .btn--icon { padding: var(--sp-2); width: 38px; height: 38px; border-radius: var(--radius-sm); border-color: var(--line); background: var(--panel); }
 .btn--icon:hover { background: var(--panel-2); }
+.btn--xs { padding: var(--sp-1) var(--sp-2); font-size: var(--t-2xs); border-color: var(--line); }
+.btn--xs svg { width: 0.95em; height: 0.95em; }
 .btn--block { width: 100%; }
 .btn.is-on { border-color: var(--accent); color: var(--accent); }
 .btn.is-rec { border-color: var(--accent-3); color: var(--accent-3); }
@@ -532,6 +534,12 @@ textarea { resize: vertical; font-family: var(--font-mono); font-size: var(--t-x
   #btn-share svg { width: 1.2em; height: 1.2em; }
   #btn-share span, #btn-share .btn__label { display: none; }
   .topbar { gap: var(--sp-3); }
+  /* the stage bar carries three readouts plus an action; drop to icons */
+  .stage-bar { gap: var(--sp-2); }
+  .stage-bar__right { gap: var(--sp-2); }
+  #btn-png { padding: var(--sp-1); }
+  #btn-png .btn__label { display: none; }
+  #engine-label { display: none; }
 }
 
 @media (max-width: 420px) {

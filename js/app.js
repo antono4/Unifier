@@ -510,6 +510,57 @@
   btnRec.addEventListener("click", toggleRecord);
 
   /* ------------------------------------------------------------------ */
+  /* Still export — re-render the current frame at 1920x1080            */
+  /* ------------------------------------------------------------------ */
+  /* The live canvas is sized to the layout, so it is whatever the window
+     happens to be. Exporting that gives a different image on every screen.
+     Instead the same renderer draws one frame into an offscreen canvas at a
+     fixed size, which also lets the export exceed the visible resolution. */
+  const EXPORT_W = 1920;
+  const EXPORT_H = 1080;
+
+  function exportStill() {
+    const off = document.createElement("canvas");
+    off.width = EXPORT_W;
+    off.height = EXPORT_H;
+    const octx = off.getContext("2d");
+
+    /* swap in a detached environment so the live stage is untouched */
+    const saved = { ctx: env.ctx, canvas: env.canvas, w: env.w, h: env.h, dpr: env.dpr };
+    env.ctx = octx;
+    env.canvas = off;
+    env.w = EXPORT_W;
+    env.h = EXPORT_H;
+    env.dpr = 1;
+
+    /* a freshly built renderer starts from a clean particle ring buffer, so the
+       image is deterministic rather than depending on how long the page ran */
+    const still = new MODES[state.mode](env);
+    const f = unifier.frame;
+
+    try {
+      octx.fillStyle = env.pal.bg;
+      octx.fillRect(0, 0, EXPORT_W, EXPORT_H);
+      still.draw(f);
+      if (state.grid) drawGrid(env);
+      drawErrorFlash(env, f);
+    } finally {
+      Object.assign(env, saved);
+    }
+
+    off.toBlob((blob) => {
+      if (!blob) { toast("Gambar gagal dibuat"); return; }
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `unifier-${state.mode}-${state.palette}-${EXPORT_W}x${EXPORT_H}.png`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      toast(`Gambar diunduh · ${EXPORT_W}×${EXPORT_H}`);
+    }, "image/png");
+  }
+  $("btn-png").addEventListener("click", exportStill);
+
+  /* ------------------------------------------------------------------ */
   /* Demo mode + keyboard                                                */
   /* ------------------------------------------------------------------ */
   function startDemo() {
@@ -531,6 +582,7 @@
     else if (k === "d") startDemo();
     else if (k === "f") toggleFullscreen();
     else if (k === "r") toggleRecord();
+    else if (k === "s") exportStill();
     else if (k === "t") setTheme(state.theme === "dark" ? "light" : "dark");
     else if (k === " ") { e.preventDefault(); setMode(MODE_ORDER[(MODE_ORDER.indexOf(state.mode) + 1) % MODE_ORDER.length], true); }
   });
@@ -578,5 +630,5 @@
   });
 
   requestAnimationFrame(loop);
-  window.__unifier = { state, unifier, env, setMode, setPalette, setTheme, toast, live, agent, speech, tts };
+  window.__unifier = { state, unifier, env, setMode, setPalette, setTheme, toast, live, agent, speech, tts, exportStill };
 })();

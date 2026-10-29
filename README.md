@@ -7,7 +7,7 @@ di browser.
 Tanpa library visual, tanpa WebGL, tanpa proses build yang wajib. Empat berkas
 JavaScript, satu mesin analisis, enam renderer.
 
-**Demo langsung:** https://antono4.github.io/VisualisasiSuaraReal-timeUnifier/
+**Demo langsung:** https://antono4.github.io/Unifier/
 
 ---
 
@@ -139,7 +139,7 @@ Skema WebSocket-nya minimal:
 - **Modus** — 6 pilihan, atau tombol <kbd>1</kbd>–<kbd>6</kbd>, <kbd>Space</kbd> untuk berikutnya
 - **Sensitivitas · Kehalusan · Kompleksitas · Kecepatan · Jejak** — semua langsung berlaku
 - **Sakelar** — kisi latar, glow, cermin bawah, label frekuensi
-- <kbd>M</kbd> mikrofon · <kbd>D</kbd> demo · <kbd>R</kbd> rekam · <kbd>F</kbd> layar penuh · <kbd>T</kbd> tema
+- <kbd>M</kbd> mikrofon · <kbd>D</kbd> demo · <kbd>R</kbd> rekam · <kbd>S</kbd> unduh PNG · <kbd>F</kbd> layar penuh · <kbd>T</kbd> tema
 
 **Setiap kontrol ditulis ke URL.** Tombol *Bagikan* menyalin tautan yang membuka
 ulang panggung persis seperti yang Anda lihat — misalnya:
@@ -148,13 +148,33 @@ ulang panggung persis seperti yang Anda lihat — misalnya:
 ?mode=unified&palette=ember&complexity=1.6&trails=0.93
 ```
 
-**Perekaman.** Tombol *Rekam* memakai `canvas.captureStream(60)` +
-`MediaRecorder` dan mengunduh WebM langsung dari kanvas.
-
 **Aksesibilitas.** `prefers-reduced-motion` dipatuhi: kecepatan diturunkan ke 0,35×
 dan ditampilkan di HUD. Tema terang/gelap, navigasi tab yang bisa dioperasikan
 dengan tombol panah, `scroll-margin-top` untuk header lengket, dan tidak ada
 kegagalan kontras WCAG AA di kedua tema.
+
+## Mengunduh hasil
+
+Ada dua cara menyimpan hasilnya, dan keduanya menyimpan berkas yang nyata —
+bukan tangkapan layar jendela.
+
+**Gambar (PNG).** Tombol *Unduh PNG* di bawah panggung menggambar ulang bingkai
+saat itu ke kanvas di luar layar berukuran tetap **1920×1080**, lalu mengunduh
+PNG. Ukurannya sengaja tidak mengikuti ukuran jendela: kalau mengekspor kanvas
+apa adanya, hasilnya akan berbeda-beda di tiap layar. Karena renderer-nya sama,
+gambar yang keluar identik dengan yang Anda lihat, hanya dengan resolusi lebih
+tinggi daripada tampilan. Renderer dibangun ulang untuk ekspor ini, sehingga
+gambar tidak bergantung pada sudah berapa lama halaman dibuka.
+
+Nama berkasnya menyimpan pengaturannya:
+
+```
+unifier-unified-aurora-1920x1080.png
+         └ modus  └ palet  └ ukuran
+```
+
+**Video (WebM).** Tombol *Rekam* memakai `canvas.captureStream(60)` +
+`MediaRecorder` dan mengunduh WebM langsung dari kanvas, 8 Mbps.
 
 ---
 
@@ -167,18 +187,18 @@ css/style.css            tata letak + komponen
 js/audio-engine.js       analisis Web Audio, osilator, mesin sintetis, Unifier
 js/sources.js            ucapan, TTS, skenario agen, WebSocket langsung
 js/visualizers.js        6 renderer Canvas 2D + overlay bersama
-js/app.js                UI, loop RAF, HUD, perekam, status URL
+js/app.js                UI, loop RAF, HUD, perekam + ekspor PNG, status URL
 tools/build.py           build satu berkas + robots/sitemap/manifest
 tools/make_assets.py     kartu sosial + ikon (Pillow)
 tools/ws-server.mjs      feed peristiwa demo (WebSocket, tanpa dependensi)
-tools/test/smoke.mjs     84 pemeriksaan di Chromium sungguhan
+tools/test/smoke.mjs     97 pemeriksaan di Chromium sungguhan
 ```
 
 ## Pengujian
 
 ```bash
 npm i puppeteer-core
-node tools/test/smoke.mjs            # 84 pemeriksaan
+node tools/test/smoke.mjs            # 97 pemeriksaan
 node tools/test/smoke.mjs --shots    # + tangkapan layar ke .agent_tmp/
 ```
 
