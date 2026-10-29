@@ -2955,11 +2955,34 @@ window.UnifierViz = { MODES, PALETTES, makePal, ramp, rgba, drawGrid, drawErrorF
   });
 
   /* ------------------------------------------------------------------ */
-  /* Recorder — WebM straight from the canvas                            */
+  /* Recorder — MP4 when the browser can mux it, WebM otherwise          */
   /* ------------------------------------------------------------------ */
   let recorder = null;
   let chunks = [];
   const btnRec = $("btn-rec");
+
+  /* MP4 first: it is what phones, editors and social platforms expect. Only
+     fairly recent Chromium can mux it, so WebM stays as the fallback rather
+     than leaving Firefox and Safari with no recording at all. */
+  const RECORD_FORMATS = [
+    { mime: "video/mp4;codecs=avc1.640028" },  // H.264 High
+    { mime: "video/mp4;codecs=avc1.4d002a" },  // H.264 Main
+    { mime: "video/mp4;codecs=avc1.42E01E" },  // H.264 Baseline
+    { mime: "video/mp4" },
+    { mime: "video/webm;codecs=vp9" },
+    { mime: "video/webm;codecs=vp8" },
+    { mime: "video/webm" },
+  ];
+
+  function pickRecordFormat() {
+    if (typeof MediaRecorder === "undefined" || typeof MediaRecorder.isTypeSupported !== "function") return null;
+    for (const f of RECORD_FORMATS) {
+      try { if (MediaRecorder.isTypeSupported(f.mime)) return f.mime; } catch { /* keep trying */ }
+    }
+    return "";
+  }
+
+  const extFor = (mime) => (mime.includes("mp4") ? "mp4" : "webm");
 
   function toggleRecord() {
     if (recorder && recorder.state === "recording") {
@@ -2970,29 +2993,37 @@ window.UnifierViz = { MODES, PALETTES, makePal, ramp, rgba, drawGrid, drawErrorF
       toast("Perekaman tidak didukung browser ini");
       return;
     }
+    const mime = pickRecordFormat();
+    if (mime === null) { toast("Perekaman tidak didukung browser ini"); return; }
+
     const stream = canvas.captureStream(60);
-    const types = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm"];
-    const mime = types.find((t) => MediaRecorder.isTypeSupported(t)) || "";
+    const opts = { videoBitsPerSecond: 8_000_000 };
+    if (mime) opts.mimeType = mime;
     try {
-      recorder = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: 8_000_000 } : undefined);
+      recorder = new MediaRecorder(stream, opts);
     } catch (e) { toast("Perekaman gagal dimulai"); return; }
+
+    /* the recorder may settle on a different container than the one asked for */
+    const actual = recorder.mimeType || mime || "video/webm";
+    const ext = extFor(actual);
+
     chunks = [];
     recorder.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
     recorder.onstop = () => {
-      const blob = new Blob(chunks, { type: mime || "video/webm" });
+      const blob = new Blob(chunks, { type: actual });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = "unifier-" + state.mode + "-" + Date.now() + ".webm";
+      a.download = `unifier-${state.mode}-${Date.now()}.${ext}`;
       a.click();
       setTimeout(() => URL.revokeObjectURL(a.href), 4000);
       btnRec.classList.remove("is-rec");
       btnRec.textContent = "Rekam";
-      toast("Rekaman diunduh (" + (blob.size / 1e6).toFixed(1) + " MB)");
+      toast(`Rekaman ${ext.toUpperCase()} diunduh (${(blob.size / 1e6).toFixed(1)} MB)`);
     };
     recorder.start(1000);
     btnRec.classList.add("is-rec");
     btnRec.textContent = "Berhenti";
-    toast("Merekam panggung…");
+    toast(`Merekam ${ext.toUpperCase()}…`);
   }
   btnRec.addEventListener("click", toggleRecord);
 
@@ -3117,7 +3148,7 @@ window.UnifierViz = { MODES, PALETTES, makePal, ramp, rgba, drawGrid, drawErrorF
   });
 
   requestAnimationFrame(loop);
-  window.__unifier = { state, unifier, env, setMode, setPalette, setTheme, toast, live, agent, speech, tts, exportStill };
+  window.__unifier = { state, unifier, env, setMode, setPalette, setTheme, toast, live, agent, speech, tts, exportStill, pickRecordFormat, extFor };
 })();
 
 </script>

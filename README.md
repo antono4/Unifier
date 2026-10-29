@@ -9,6 +9,14 @@ JavaScript, satu mesin analisis, enam renderer.
 
 **Demo langsung:** https://antono4.github.io/Unifier/
 
+<img src="docs/hero.webp" alt="Antarmuka Unifier: panel kontrol di kiri, panggung visualisasi di kanan" width="100%">
+
+<p align="center"><sub><i>Mode Unified berjalan di atas feed demo — tangkapan dari aplikasi yang sedang berjalan.</i></sub></p>
+
+<img src="docs/preview.webp" alt="Pratinjau bergerak: panggung Unifier bereaksi terhadap sinyal demo" width="100%">
+
+<p align="center"><sub><i>Pratinjau bergerak — diambil langsung dari kanvas, 28 bingkai. Visualisasi real-time tidak bisa ditunjukkan oleh gambar diam.</i></sub></p>
+
 ---
 
 ## Apa yang diuji
@@ -77,6 +85,21 @@ berguna untuk arsip atau untuk membukanya langsung dari disk.
 | **Partikel** | medan pusaran dari diferensial pita; kecepatan dan warna per partikel dari pita asalnya |
 | **Terowongan** | heksagon berperspektif yang menjauh; kecepatan mengikuti tingkat sinyal |
 | **Unified** | semua lapisan sekaligus — motes, spektrum, gelombang, partikel, cincin, kilatan |
+
+<table>
+<tr>
+<td width="33%"><img src="docs/mode-bars.webp" alt="Modus Spektrum"><br><sub><b>Spektrum</b></sub></td>
+<td width="33%"><img src="docs/mode-wave.webp" alt="Modus Gelombang"><br><sub><b>Gelombang</b></sub></td>
+<td width="33%"><img src="docs/mode-radial.webp" alt="Modus Radial"><br><sub><b>Radial</b></sub></td>
+</tr>
+<tr>
+<td><img src="docs/mode-particles.webp" alt="Modus Partikel"><br><sub><b>Partikel</b></sub></td>
+<td><img src="docs/mode-tunnel.webp" alt="Modus Terowongan"><br><sub><b>Terowongan</b></sub></td>
+<td><img src="docs/mode-unified.webp" alt="Modus Unified"><br><sub><b>Unified</b></sub></td>
+</tr>
+</table>
+
+<p align="center"><sub><i>Keenam gambar di atas dihasilkan oleh tombol <b>Unduh PNG</b> itu sendiri — 1920×1080, lalu diperkecil untuk README.</i></sub></p>
 
 ## Palet
 
@@ -153,6 +176,10 @@ dan ditampilkan di HUD. Tema terang/gelap, navigasi tab yang bisa dioperasikan
 dengan tombol panah, `scroll-margin-top` untuk header lengket, dan tidak ada
 kegagalan kontras WCAG AA di kedua tema.
 
+<img src="docs/light.webp" alt="Panggung yang sama dalam tema terang" width="100%">
+
+<p align="center"><sub><i>Tema terang. Kontras diaudit dengan mengukur warna yang benar-benar tergambar, bukan dengan membaca CSS.</i></sub></p>
+
 ## Mengunduh hasil
 
 Ada dua cara menyimpan hasilnya, dan keduanya menyimpan berkas yang nyata —
@@ -173,8 +200,13 @@ unifier-unified-aurora-1920x1080.png
          └ modus  └ palet  └ ukuran
 ```
 
-**Video (WebM).** Tombol *Rekam* memakai `canvas.captureStream(60)` +
-`MediaRecorder` dan mengunduh WebM langsung dari kanvas, 8 Mbps.
+**Video (MP4).** Tombol *Rekam* memakai `canvas.captureStream(60)` +
+`MediaRecorder` dan mengunduh **MP4 (H.264)** langsung dari kanvas, 8 Mbps.
+Pilihannya mencoba H.264 High → Main → Baseline → `video/mp4` polos, lalu jatuh ke
+VP9/VP8/WebM bila browser tidak bisa membungkus MP4 — Firefox dan Safari belum
+semuanya bisa, dan lebih baik mereka dapat WebM daripada tidak bisa merekam sama
+sekali. Ekstensi berkas mengikuti kontainer yang benar-benar dipakai perekam, bukan
+yang diminta, karena `MediaRecorder` kadang memilih sendiri.
 
 ---
 
@@ -191,14 +223,16 @@ js/app.js                UI, loop RAF, HUD, perekam + ekspor PNG, status URL
 tools/build.py           build satu berkas + robots/sitemap/manifest
 tools/make_assets.py     kartu sosial + ikon (Pillow)
 tools/ws-server.mjs      feed peristiwa demo (WebSocket, tanpa dependensi)
-tools/test/smoke.mjs     97 pemeriksaan di Chromium sungguhan
+tools/make-shots.mjs     tangkapan layar + bingkai animasi untuk README
+docs/                    gambar README (WebP statis + pratinjau bergerak)
+tools/test/smoke.mjs     108 pemeriksaan di Chromium sungguhan
 ```
 
 ## Pengujian
 
 ```bash
 npm i puppeteer-core
-node tools/test/smoke.mjs            # 97 pemeriksaan
+node tools/test/smoke.mjs            # 108 pemeriksaan
 node tools/test/smoke.mjs --shots    # + tangkapan layar ke .agent_tmp/
 ```
 

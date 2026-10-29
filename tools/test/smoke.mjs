@@ -81,6 +81,10 @@ async function canvasStats(page) {
     let lum = 0;
     let n = 0;
     let max = 0;
+    /* Mean hue, accumulated as a circular mean: summing raw degrees would put
+       the average of 350° and 10° at 180° instead of 0°. Only saturated pixels
+       count, since hue is meaningless on near-grey. */
+    let hx = 0, hy = 0, hn = 0;
     const seen = new Set();
     const stride = 4 * 7; // sample ~1/7 of pixels
     for (let i = 0; i < data.length; i += stride) {
@@ -91,12 +95,26 @@ async function canvasStats(page) {
       lum += l;
       n++;
       if (l > max) max = l;
+      const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+      const chroma = mx - mn;
+      if (chroma > 24 && mx > 40) {
+        let h;
+        if (mx === r) h = ((g - b) / chroma) % 6;
+        else if (mx === g) h = (b - r) / chroma + 2;
+        else h = (r - g) / chroma + 4;
+        const rad = (h * 60 * Math.PI) / 180;
+        hx += Math.cos(rad); hy += Math.sin(rad); hn++;
+      }
       seen.add(((r >> 3) << 10) | ((g >> 3) << 5) | (b >> 3));
+    }
+    let hue = -1;
+    if (hn) {
+      hue = ((Math.atan2(hy / hn, hx / hn) * 180) / Math.PI + 360) % 360;
     }
     return {
       w: c.width, h: c.height,
       meanLum: lum / n, maxLum: max,
-      colours: seen.size,
+      colours: seen.size, hue, hueSamples: hn,
     };
   });
 }
@@ -254,7 +272,7 @@ async function main() {
     check(`mode "${m}" updates HUD`, hudMode === m.toUpperCase());
     if (SHOTS) await page.screenshot({ path: join(OUT, `mode-${m}.png`) });
   }
-  const sigs = new Set(modes.map((m) => `${stats[m].colours}/${stats[m].meanLum.toFixed(1)}`));
+  const sigs = new Set(modes.map((m) => `${stats[m].colours}/${stats[m].meanLum.toFixed(1)}/${stats[m].hue.toFixed(0)}`));
   check("modes are visually distinct from each other", sigs.size === modes.length,
     `${sigs.size}/${modes.length} unique signatures`);
 
@@ -266,8 +284,15 @@ async function main() {
   await page.evaluate(() => window.__unifier.setPalette("ember"));
   await sleep(700);
   const ember = await canvasStats(page);
-  check("switching palette changes the frame", Math.abs(aurora.meanLum - ember.meanLum) > 0.5,
-    `aurora=${aurora.meanLum.toFixed(1)} ember=${ember.meanLum.toFixed(1)}`);
+  /* Compare hue, not brightness. aurora is teal/violet and ember is amber, but
+     the two can land on nearly the same mean luminance — a brightness check is
+     a weak proxy that passes or fails on animation timing. Hue separates them
+     by a wide, stable margin. */
+  const hueGap = Math.abs(((aurora.hue - ember.hue + 540) % 360) - 180);
+  check("palettes paint measurably different hues", hueGap > 15,
+    `aurora hue=${aurora.hue.toFixed(0)}° ember hue=${ember.hue.toFixed(0)}° gap=${hueGap.toFixed(0)}°`);
+  check("both palettes sample saturated pixels", aurora.hueSamples > 20 && ember.hueSamples > 20,
+    `aurora=${aurora.hueSamples} ember=${ember.hueSamples}`);
   const cssVar = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--s1").trim());
   check("palette writes through to CSS vars", cssVar === "#fbbf24", cssVar);
 
@@ -420,7 +445,44 @@ async function main() {
   check("export does not throw", (await page.evaluate(() => window.__unifier.env.w > 0)) === true);
   void beforeExport.hash;
 
-  console.log("\n11. Speech synthesis path");
+  console.log("\n11. Video recording (MP4)");
+  const fmt = await page.evaluate(() => ({
+    chosen: window.__unifier.pickRecordFormat(),
+    ext: window.__unifier.extFor(window.__unifier.pickRecordFormat() || ""),
+  }));
+  check("a recording format is available", typeof fmt.chosen === "string" && fmt.chosen.length > 0, fmt.chosen || "(none)");
+  check("MP4 is preferred when the browser can mux it", fmt.ext === "mp4", fmt.chosen);
+
+  /* record for real: drive the demo, capture ~1.5s, then inspect the file */
+  await page.evaluate(() => {
+    window.__rec = { blob: null, name: null };
+    const real = URL.createObjectURL.bind(URL);
+    URL.createObjectURL = (o) => { if (o instanceof Blob) window.__rec.blob = o; return real(o); };
+    HTMLAnchorElement.prototype.click = function () { window.__rec.name = this.download; };
+  });
+  await page.evaluate(() => window.__unifier.unifier.demo());
+  await sleep(500);
+  await page.click("#btn-rec");
+  await sleep(1500);
+  await page.click("#btn-rec");
+  await sleep(1200);
+
+  const rec = await page.evaluate(async () => {
+    const blob = window.__rec.blob;
+    if (!blob) return { ok: false };
+    const buf = new Uint8Array(await blob.arrayBuffer());
+    /* ISO-BMFF files carry an 'ftyp' box at offset 4 and the brand at 8..12 */
+    const tag = String.fromCharCode(...buf.slice(4, 8));
+    const brand = String.fromCharCode(...buf.slice(8, 12));
+    return { ok: true, type: blob.type, size: blob.size, tag, brand, name: window.__rec.name, header: [...buf.slice(0, 4)].join(",") };
+  });
+  check("recording produces a file", rec.ok && rec.size > 0, rec.ok ? (rec.size / 1024).toFixed(0) + " KB" : "no blob");
+  check("recording is MP4 (ftyp box present)", rec.tag === "ftyp", rec.tag || "-");
+  check("MP4 brand is a known video brand", /^(isom|iso[0-9]|mp4[12]|avc1|dash|MSNV|iso6)/.test(rec.brand || ""), rec.brand || "-");
+  check("recording filename ends in .mp4", /\.mp4$/.test(rec.name || ""), rec.name || "-");
+  check("recording has real content", rec.size > 5000, (rec.size / 1024).toFixed(0) + " KB");
+
+  console.log("\n12. Speech synthesis path");
   await page.evaluate(() => {
     document.getElementById("tab-speech").click();
     window.__unifier.unifier.ttsDrive();
@@ -433,7 +495,7 @@ async function main() {
   const ttsStatus = await page.$eval("#speech-note", (e) => e.textContent);
   check("TTS reports a status", /Berbicara|Selesai|tidak didukung|gagal/i.test(ttsStatus), ttsStatus);
 
-  console.log("\n12. Microphone path with a fake device");
+  console.log("\n13. Microphone path with a fake device");
   await page.evaluate(() => document.getElementById("tab-audio").click());
   await page.click("#btn-mic");
   await sleep(2500);
@@ -446,7 +508,7 @@ async function main() {
   const meter = await page.$eval("#meter-label", (e) => e.textContent);
   check("dB meter is populated", /dB/.test(meter), meter);
 
-  console.log("\n13. Oscillator generator");
+  console.log("\n14. Oscillator generator");
   await page.click("#btn-mic"); // release the device first
   await sleep(300);
   await page.click("#btn-osc");
@@ -458,7 +520,7 @@ async function main() {
   const stopped = await page.evaluate(() => window.__unifier.unifier.mode);
   check("stopping the oscillator returns to idle", stopped === "idle", "mode=" + stopped);
 
-  console.log("\n14. URL state round-trip");
+  console.log("\n15. URL state round-trip");
   await page.evaluate(() => {
     window.__unifier.setMode("tunnel", false);
     window.__unifier.setPalette("ion");
@@ -484,7 +546,7 @@ async function main() {
   check("URL restores numeric control", Math.abs(restored.complexity - 1.75) < 1e-6, String(restored.complexity));
   check("URL restores boolean toggle", restored.glow === false, String(restored.glow));
 
-  console.log("\n15. Theme + share");
+  console.log("\n16. Theme + share");
   await page.click("#btn-theme");
   const theme = await page.evaluate(() => document.documentElement.getAttribute("data-theme"));
   check("theme toggles to light", theme === "light", theme);
@@ -495,7 +557,7 @@ async function main() {
   if (SHOTS) await page.screenshot({ path: join(OUT, "theme-light.png"), fullPage: false });
   await page.click("#btn-theme");
 
-  console.log("\n16. Layout + accessibility invariants");
+  console.log("\n17. Layout + accessibility invariants");
   const layout = await page.evaluate(() => {
     const stage = document.getElementById("stage-wrap").getBoundingClientRect();
     const cs = getComputedStyle(document.body);
@@ -566,7 +628,7 @@ async function main() {
   if (SHOTS) await page.screenshot({ path: join(OUT, "narrow.png"), fullPage: false });
   await page.setViewport({ width: 1440, height: 1000 });
 
-  console.log("\n17. Reduced motion is honoured");
+  console.log("\n18. Reduced motion is honoured");
   await page.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
   await page.reload({ waitUntil: "networkidle0" });
   await page.waitForFunction(() => !!window.__unifier, { timeout: 10_000 });
@@ -575,7 +637,7 @@ async function main() {
   const engineLabel = await page.$eval("#engine-label", (e) => e.textContent);
   check("reduced-motion is surfaced in the HUD", /reduced-motion/.test(engineLabel), engineLabel);
 
-  console.log("\n18. Single-file build is self-contained");
+  console.log("\n19. Single-file build is self-contained");
   const distHtml = await readFile(join(ROOT, "dist/unifier.html"), "utf8");
   check("dist has no external css link", !/rel="stylesheet" href="(?!data:)/.test(distHtml));
   check("dist has no external script src", !/<script src="/.test(distHtml));
@@ -594,7 +656,7 @@ async function main() {
   check("dist build has no console errors", distErrors.length === 0, distErrors.slice(0, 2).join(" | "));
   await page2.close();
 
-  console.log("\n19. Meta + generated files");
+  console.log("\n20. Meta + generated files");
   const meta = await page.evaluate(() => ({
     title: document.title,
     desc: document.querySelector('meta[name="description"]')?.content || "",
@@ -614,7 +676,7 @@ async function main() {
   const robots = await readFile(join(ROOT, "robots.txt"), "utf8");
   check("robots.txt points at the sitemap", robots.includes("sitemap.xml"));
 
-  console.log("\n20. Anchor links resolve");
+  console.log("\n21. Anchor links resolve");
   const deadAnchors = await page.evaluate(() => {
     const ids = new Set([...document.querySelectorAll("[id]")].map((e) => e.id));
     return [...document.querySelectorAll('a[href^="#"]')]
@@ -627,6 +689,23 @@ async function main() {
     return getComputedStyle(el).scrollMarginTop;
   });
   check("anchors clear the sticky header", scrollMargin !== "0px" && scrollMargin !== "", scrollMargin);
+
+  console.log("\n22. README images resolve");
+  const readme = await readFile(join(ROOT, "README.md"), "utf8");
+  const imgSrcs = [...readme.matchAll(/<img[^>]+src="([^"]+)"/g)].map((m) => m[1])
+    .filter((u) => !/^https?:/.test(u));
+  check("README embeds at least one image", imgSrcs.length > 0, imgSrcs.length + " images");
+  const missing = [];
+  for (const rel of imgSrcs) {
+    try { await readFile(join(ROOT, rel)); } catch { missing.push(rel); }
+  }
+  check("every README image exists on disk", missing.length === 0, missing.join(", ") || "all present");
+  /* docs/ is committed, so the images must be small enough to live in the repo */
+  let imgBytes = 0;
+  for (const rel of imgSrcs) { try { imgBytes += (await readFile(join(ROOT, rel))).length; } catch { /* counted as missing */ } }
+  /* docs/ is committed; the stills are small but the animated preview is not,
+     so the budget covers both and still catches an accidental 3 MB screenshot */
+  check("README images stay lightweight (< 1.5 MB total)", imgBytes < 1536 * 1024, (imgBytes / 1024).toFixed(0) + " KB");
 
   check("no console errors across the whole run", errors.length === 0, errors.slice(0, 4).join(" | "));
 
