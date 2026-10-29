@@ -1,0 +1,3061 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Unifier — Visualisasi Suara Real-time</title>
+<meta name="description" content="Eksperimen Unifier: sistem visualisasi suara buatan sendiri yang mengubah audio, ucapan, dan sinyal agen AI menjadi efek visual real-time di browser.">
+<meta name="theme-color" content="#070b14">
+<meta name="color-scheme" content="dark light">
+<link rel="canonical" href="https://antono4.github.io/VisualisasiSuaraReal-timeUnifier/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Unifier — Visualisasi Suara Real-time">
+<meta property="og:description" content="Mengubah audio, ucapan, dan sinyal agen AI menjadi efek visual. Mesin visualisasi buatan sendiri, tanpa library.">
+<meta property="og:url" content="https://antono4.github.io/VisualisasiSuaraReal-timeUnifier/">
+<meta property="og:image" content="https://antono4.github.io/VisualisasiSuaraReal-timeUnifier/assets/social-card.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Unifier — Visualisasi Suara Real-time">
+<meta name="twitter:description" content="Audio, ucapan, dan sinyal agen AI menjadi efek visual real-time.">
+<meta name="twitter:image" content="https://antono4.github.io/VisualisasiSuaraReal-timeUnifier/assets/social-card.png">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwIiB5MT0iMSIgeDI9IjAiIHkyPSIwIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMmRkNGJmIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzYzNjZmMSIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzA3MGIxNCIvPgogIDxnIGZpbGw9InVybCgjZykiPgogICAgPHJlY3QgeD0iNyIgIHk9IjE0IiB3aWR0aD0iMyIgaGVpZ2h0PSI4IiAgcng9IjEuNSIvPgogICAgPHJlY3QgeD0iMTIiIHk9IjgiICB3aWR0aD0iMyIgaGVpZ2h0PSIxNiIgcng9IjEuNSIvPgogICAgPHJlY3QgeD0iMTciIHk9IjExIiB3aWR0aD0iMyIgaGVpZ2h0PSIxMiIgcng9IjEuNSIvPgogICAgPHJlY3QgeD0iMjIiIHk9IjYiICB3aWR0aD0iMyIgaGVpZ2h0PSIxOCIgcng9IjEuNSIvPgogIDwvZz4KPC9zdmc+Cg==" type="image/svg+xml">
+<link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiVW5pZmllciBcdTIwMTQgVmlzdWFsaXNhc2kgU3VhcmEgUmVhbC10aW1lIiwic2hvcnRfbmFtZSI6IlVuaWZpZXIiLCJkZXNjcmlwdGlvbiI6IkVrc3BlcmltZW4gdmlzdWFsaXNhc2kgc3VhcmE6IGF1ZGlvLCB1Y2FwYW4sIGRhbiBzaW55YWwgYWdlbiBBSSBtZW5qYWRpIGVmZWsgdmlzdWFsLiIsInN0YXJ0X3VybCI6Imh0dHBzOi8vYW50b25vNC5naXRodWIuaW8vVmlzdWFsaXNhc2lTdWFyYVJlYWwtdGltZVVuaWZpZXIvIiwic2NvcGUiOiJodHRwczovL2FudG9ubzQuZ2l0aHViLmlvL1Zpc3VhbGlzYXNpU3VhcmFSZWFsLXRpbWVVbmlmaWVyLyIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwNzBiMTQiLCJ0aGVtZV9jb2xvciI6IiMwNzBiMTQiLCJsYW5nIjoiaWQiLCJpY29ucyI6W3sic3JjIjoiaHR0cHM6Ly9hbnRvbm80LmdpdGh1Yi5pby9WaXN1YWxpc2FzaVN1YXJhUmVhbC10aW1lVW5pZmllci9hc3NldHMvZmF2aWNvbi5zdmciLCJzaXplcyI6ImFueSIsInR5cGUiOiJpbWFnZS9zdmcreG1sIiwicHVycG9zZSI6ImFueSBtYXNrYWJsZSJ9XX0=">
+<style>
+/* Unifier — design tokens
+   Single source of truth for colour, type, space, motion, depth. */
+
+:root {
+  /* ---- palette (dark, default) ---- */
+  --bg: hsl(218 32% 5%);
+  --bg-soft: hsl(218 28% 8%);
+  --panel: hsl(218 24% 11%);
+  --panel-2: hsl(218 22% 14%);
+  --line: hsl(218 20% 20%);
+  --line-soft: hsl(218 20% 16%);
+  --text: hsl(210 30% 96%);
+  --text-dim: hsl(214 16% 68%);
+  /* 56% keeps ≥4.7:1 on the darkest panel it is ever painted on */
+  --text-mute: hsl(214 14% 56%);
+
+  --accent: hsl(170 68% 54%);
+  --accent-2: hsl(239 78% 70%);
+  --accent-3: hsl(330 78% 68%);
+  --accent-ink: hsl(218 40% 7%);
+
+  /* visualizer swatches (overridden by JS per palette) */
+  --s1: #2dd4bf;
+  --s2: #6366f1;
+  --s3: #f472b6;
+
+  /* ---- type ramp: exactly 9 steps ---- */
+  --t-2xs: 0.6875rem;
+  --t-xs: 0.75rem;
+  --t-sm: 0.8125rem;
+  --t-md: 0.9375rem;
+  --t-lg: 1.0625rem;
+  --t-xl: 1.375rem;
+  --t-2xl: 2rem;
+  --t-3xl: clamp(2.4rem, 5.2vw, 3.9rem);
+  --t-4xl: clamp(3rem, 7vw, 5rem);
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code", Menlo, Consolas, monospace;
+
+  /* ---- space ---- */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.5rem;
+  --sp-6: 2rem;
+  --sp-7: 3rem;
+  --sp-8: 4.5rem;
+
+  --radius-sm: 8px;
+  --radius: 14px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+
+  /* ---- depth: contact + ambient pair per level ---- */
+  --sh-1: 0 1px 1px hsl(218 40% 2% / 0.4), 0 2px 8px hsl(218 40% 2% / 0.28);
+  --sh-2: 0 1px 1px hsl(218 40% 2% / 0.45), 0 8px 24px hsl(218 40% 2% / 0.4);
+  --sh-3: 0 2px 2px hsl(218 40% 2% / 0.5), 0 18px 48px hsl(218 40% 2% / 0.52);
+  --sh-inset: inset 0 1px 0 hsl(210 40% 100% / 0.05);
+
+  /* ---- motion ---- */
+  --ease: cubic-bezier(0.32, 0.72, 0.28, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-1: 120ms;
+  --dur-2: 220ms;
+  --dur-3: 420ms;
+
+  --ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+}
+
+[data-theme="light"] {
+  --bg: hsl(210 34% 97%);
+  --bg-soft: hsl(210 30% 94%);
+  --panel: hsl(0 0% 100%);
+  --panel-2: hsl(210 30% 96.5%);
+  --line: hsl(214 22% 84%);
+  --line-soft: hsl(214 22% 89%);
+  --text: hsl(218 40% 12%);
+  --text-dim: hsl(216 18% 34%);
+  /* 42% keeps ≥5.2:1 on --panel-2, the lightest surface it sits on */
+  --text-mute: hsl(216 14% 42%);
+
+  /* dark enough for white ink at 5.06:1 — also fixes accent text on light panels */
+  --accent: hsl(174 74% 28%);
+  --accent-2: hsl(243 62% 46%);
+  --accent-3: hsl(330 66% 46%);
+  --accent-ink: hsl(0 0% 100%);
+
+  --sh-1: 0 1px 1px hsl(218 30% 40% / 0.14), 0 2px 6px hsl(218 30% 40% / 0.1);
+  --sh-2: 0 1px 1px hsl(218 30% 40% / 0.16), 0 8px 22px hsl(218 30% 40% / 0.14);
+  --sh-3: 0 2px 2px hsl(218 30% 40% / 0.18), 0 18px 44px hsl(218 30% 40% / 0.18);
+  --sh-inset: inset 0 1px 0 hsl(0 0% 100% / 0.7);
+
+  --ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+}
+
+</style>
+<style>
+/* Unifier — layout & components
+   Aesthetic: lab instrument. Thin rules, monospace readouts, restrained glow. */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background:
+    radial-gradient(1200px 620px at 78% -8%, hsl(174 70% 40% / 0.16), transparent 62%),
+    radial-gradient(980px 560px at 6% 4%, hsl(243 70% 52% / 0.14), transparent 60%),
+    var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--t-md);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+[data-theme="light"] body {
+  background:
+    radial-gradient(1200px 620px at 78% -8%, hsl(174 70% 45% / 0.1), transparent 62%),
+    radial-gradient(980px 560px at 6% 4%, hsl(243 70% 60% / 0.08), transparent 60%),
+    var(--bg);
+}
+
+/* faint engineering grid, faded with a mask so it never fights the content */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(to right, var(--line-soft) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--line-soft) 1px, transparent 1px);
+  background-size: 56px 56px;
+  opacity: 0.5;
+  -webkit-mask-image: radial-gradient(120% 90% at 50% 0%, #000 8%, transparent 72%);
+  mask-image: radial-gradient(120% 90% at 50% 0%, #000 8%, transparent 72%);
+}
+
+h1, h2, h3 { margin: 0; line-height: 1.12; letter-spacing: -0.022em; font-weight: 640; }
+p { margin: 0; }
+a { color: inherit; text-decoration: none; }
+svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+button, input, select, textarea { font: inherit; color: inherit; }
+.mono { font-family: var(--font-mono); font-size: 0.92em; letter-spacing: -0.01em; }
+.dim { color: var(--text-mute); }
+:focus-visible { outline: none; box-shadow: var(--ring); border-radius: var(--radius-sm); }
+
+.skip-link {
+  position: fixed; top: var(--sp-3); left: var(--sp-3); z-index: 100;
+  padding: var(--sp-2) var(--sp-4); border-radius: var(--radius-pill);
+  background: var(--accent); color: var(--accent-ink); font-weight: 600;
+  transform: translateY(-160%); transition: transform var(--dur-2) var(--ease-out);
+}
+.skip-link:focus-visible { transform: none; }
+
+/* scroll-margin: the topbar is sticky, so in-page anchors need breathing room */
+[id] { scroll-margin-top: 96px; }
+
+/* ============================== TOPBAR ============================== */
+.topbar {
+  position: sticky; top: 0; z-index: 40;
+  display: flex; align-items: center; gap: var(--sp-5);
+  padding: var(--sp-3) clamp(var(--sp-4), 4vw, var(--sp-7));
+  border-bottom: 1px solid var(--line-soft);
+  background: color-mix(in hsl, var(--bg) 76%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  backdrop-filter: blur(14px) saturate(1.4);
+}
+.topbar__brand { display: flex; align-items: center; gap: var(--sp-3); }
+.topbar__nav { display: flex; gap: var(--sp-5); margin-left: auto; font-size: var(--t-sm); color: var(--text-dim); }
+.topbar__nav a { position: relative; padding: var(--sp-1) 0; transition: color var(--dur-1) var(--ease); }
+.topbar__nav a::after {
+  content: ""; position: absolute; left: 0; right: 100%; bottom: -2px; height: 1px;
+  background: var(--accent); transition: right var(--dur-2) var(--ease-out);
+}
+.topbar__nav a:hover { color: var(--text); }
+.topbar__nav a:hover::after { right: 0; }
+.topbar__actions { display: flex; align-items: center; gap: var(--sp-2); }
+
+.wordmark { font-size: var(--t-lg); font-weight: 700; letter-spacing: -0.03em; }
+.wordmark__a { color: var(--text); }
+.wordmark__b {
+  background: linear-gradient(96deg, var(--accent), var(--accent-2) 52%, var(--accent-3));
+  background-size: 220% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: sheen 9s var(--ease) infinite;
+}
+@keyframes sheen { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+
+/* equaliser bars doubling as the product logo */
+.logo { display: inline-flex; align-items: flex-end; gap: 2px; height: 20px; }
+.logo i {
+  display: block; width: 3px; border-radius: 2px;
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+  animation: eq 1.25s var(--ease) infinite;
+  transform-origin: bottom;
+}
+.logo i:nth-child(1) { height: 42%; animation-delay: 0s; }
+.logo i:nth-child(2) { height: 82%; animation-delay: 0.14s; }
+.logo i:nth-child(3) { height: 56%; animation-delay: 0.28s; }
+.logo i:nth-child(4) { height: 96%; animation-delay: 0.42s; }
+.logo i:nth-child(5) { height: 64%; animation-delay: 0.56s; }
+@keyframes eq { 0%, 100% { transform: scaleY(0.42); } 50% { transform: scaleY(1); } }
+.logo--lg { height: 44px; gap: 3px; }
+.logo--lg i { width: 5px; }
+
+.pill {
+  padding: 2px var(--sp-3); border-radius: var(--radius-pill);
+  border: 1px solid var(--line); background: var(--panel);
+  font-family: var(--font-mono); font-size: var(--t-2xs); color: var(--text-mute);
+  text-transform: lowercase;
+}
+
+/* ============================== BUTTONS ============================== */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid transparent; border-radius: var(--radius-sm);
+  /* without this, buttons with no explicit background inherit the UA default grey */
+  background: transparent;
+  font-size: var(--t-sm); font-weight: 560; letter-spacing: -0.01em;
+  cursor: pointer; white-space: nowrap;
+  transition: transform var(--dur-1) var(--ease), background var(--dur-1) var(--ease),
+              border-color var(--dur-1) var(--ease), box-shadow var(--dur-2) var(--ease);
+}
+.btn svg { width: 1.05em; height: 1.05em; }
+.btn:active { transform: translateY(1px) scale(0.985); }
+.btn:disabled { opacity: 0.42; cursor: not-allowed; transform: none; }
+.btn--primary {
+  /* mixes toward --text, so the gradient lifts the surface in dark mode and
+     deepens it in light mode; either way the ink keeps its contrast */
+  background: linear-gradient(180deg, color-mix(in hsl, var(--accent) 88%, var(--text) 12%), var(--accent));
+  color: var(--accent-ink); box-shadow: var(--sh-1), var(--sh-inset);
+}
+.btn--primary:hover:not(:disabled) { box-shadow: var(--sh-2), var(--sh-inset); filter: brightness(1.06); }
+.btn--outline { border-color: var(--line); background: var(--panel); color: var(--text); box-shadow: var(--sh-1); }
+.btn--outline:hover:not(:disabled) { border-color: color-mix(in hsl, var(--accent) 55%, var(--line)); background: var(--panel-2); }
+.btn--ghost { color: var(--text-dim); }
+.btn--ghost:hover:not(:disabled) { color: var(--text); background: var(--panel); }
+.btn--icon { padding: var(--sp-2); width: 38px; height: 38px; border-radius: var(--radius-sm); border-color: var(--line); background: var(--panel); }
+.btn--icon:hover { background: var(--panel-2); }
+.btn--block { width: 100%; }
+.btn.is-on { border-color: var(--accent); color: var(--accent); }
+.btn.is-rec { border-color: var(--accent-3); color: var(--accent-3); }
+
+kbd {
+  font-family: var(--font-mono); font-size: var(--t-2xs);
+  padding: 1px 5px; border: 1px solid var(--line); border-bottom-width: 2px;
+  border-radius: 5px; background: var(--panel-2); color: var(--text-dim);
+}
+
+/* ============================== LAYOUT ============================== */
+main { position: relative; z-index: 1; }
+section { padding: clamp(var(--sp-6), 6vw, var(--sp-8)) clamp(var(--sp-4), 4vw, var(--sp-7)); }
+
+/* ============================== HERO ============================== */
+.hero {
+  display: grid; gap: clamp(var(--sp-5), 4vw, var(--sp-7));
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  align-items: center;
+  max-width: 1440px; margin: 0 auto;
+  padding-top: clamp(var(--sp-6), 5vw, var(--sp-7));
+}
+.eyebrow {
+  display: inline-flex; align-items: center; gap: var(--sp-2);
+  font-family: var(--font-mono); font-size: var(--t-xs); color: var(--text-dim);
+  padding: var(--sp-1) var(--sp-3); border: 1px solid var(--line); border-radius: var(--radius-pill);
+  background: var(--panel); margin-bottom: var(--sp-5);
+}
+.eyebrow .dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  box-shadow: 0 0 0 4px color-mix(in hsl, var(--accent) 22%, transparent);
+  animation: pulse 2.4s var(--ease) infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+.hero h1 { font-size: var(--t-3xl); margin-bottom: var(--sp-5); font-weight: 660; }
+.hero h1 em {
+  font-style: normal;
+  background: linear-gradient(100deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.lede { color: var(--text-dim); font-size: var(--t-lg); max-width: 46ch; margin-bottom: var(--sp-6); }
+.lede strong { color: var(--text); font-weight: 600; }
+.hero__actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); align-items: center; }
+
+.stat-row {
+  display: flex; flex-wrap: wrap; gap: var(--sp-6);
+  list-style: none; margin: var(--sp-6) 0 0; padding: var(--sp-5) 0 0;
+  border-top: 1px solid var(--line-soft);
+}
+.stat-row li { display: flex; flex-direction: column; gap: 2px; }
+.stat-row b { font-family: var(--font-mono); font-size: var(--t-xl); font-weight: 600; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.stat-row span { font-size: var(--t-xs); color: var(--text-mute); }
+
+/* ============================== STAGE ============================== */
+.hero__viz { position: relative; }
+.stage-wrap {
+  position: relative; aspect-ratio: 16 / 9; width: 100%;
+  border-radius: var(--radius-lg); overflow: hidden;
+  border: 1px solid var(--line);
+  background: hsl(220 40% 3%);
+  box-shadow: var(--sh-3);
+  isolation: isolate;
+}
+.stage-wrap::after { /* inner hairline for the "bezel" feel */
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  border-radius: inherit; box-shadow: inset 0 0 0 1px hsl(210 40% 100% / 0.06);
+}
+#stage-canvas { display: block; width: 100%; height: 100%; }
+.stage-glow {
+  position: absolute; inset: -18%; z-index: -1; pointer-events: none;
+  background: radial-gradient(52% 52% at 50% 50%, color-mix(in hsl, var(--accent) 34%, transparent), transparent 70%);
+  filter: blur(46px); opacity: 0.6;
+  transition: opacity var(--dur-3) var(--ease);
+}
+.stage-wrap[data-active="false"] .stage-glow { opacity: 0.18; }
+
+.hud { position: absolute; inset: 0; pointer-events: none; font-family: var(--font-mono); font-size: var(--t-2xs); color: hsl(174 60% 78% / 0.85); }
+.hud__tick { position: absolute; width: 14px; height: 14px; border: 1px solid currentColor; opacity: 0.55; }
+.hud__tick.tl { top: 12px; left: 12px; border-right: 0; border-bottom: 0; }
+.hud__tick.tr { top: 12px; right: 12px; border-left: 0; border-bottom: 0; }
+.hud__tick.bl { bottom: 12px; left: 12px; border-right: 0; border-top: 0; }
+.hud__tick.br { bottom: 12px; right: 12px; border-left: 0; border-top: 0; }
+.hud__line { position: absolute; top: 12px; left: 34px; right: 34px; height: 1px; background: currentColor; opacity: 0.2; }
+.hud__tag { position: absolute; top: 20px; left: 34px; letter-spacing: 0.14em; text-transform: uppercase; }
+.hud__mode { position: absolute; top: 20px; right: 34px; letter-spacing: 0.1em; }
+.hud__scale { position: absolute; bottom: 20px; left: 34px; right: 34px; display: flex; justify-content: space-between; opacity: 0.5; }
+.hud__scale i { font-style: normal; letter-spacing: 0.08em; }
+
+.stage-overlay {
+  position: absolute; inset: 0; display: grid; place-items: center; text-align: center;
+  background: color-mix(in hsl, var(--bg) 62%, transparent);
+  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  transition: opacity var(--dur-3) var(--ease), visibility 0s;
+}
+.stage-overlay[hidden] { display: none; }
+.stage-overlay__inner { display: grid; justify-items: center; gap: var(--sp-3); padding: var(--sp-5); }
+.stage-overlay__title { font-size: var(--t-lg); font-weight: 600; }
+.stage-overlay__hint { font-size: var(--t-sm); color: var(--text-dim); }
+/* the overlay sits on the canvas, so it carries its own solid backdrop in both themes */
+[data-theme="light"] .stage-overlay { background: rgba(255, 255, 255, 0.82); }
+[data-theme="light"] .stage-overlay__hint { color: var(--text); }
+[data-theme="light"] .stage-overlay__title { color: var(--text); }
+
+.stage-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4);
+  margin-top: var(--sp-3); padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--line-soft); border-radius: var(--radius-sm); background: var(--panel);
+  font-size: var(--t-sm); color: var(--text-dim);
+}
+.now-playing { display: flex; align-items: center; gap: var(--sp-3); min-width: 0; }
+.now-playing > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 13px; flex: none; }
+.eq i { width: 3px; background: var(--accent); border-radius: 2px; height: 30%; animation: eq 0.9s var(--ease) infinite; }
+.eq i:nth-child(2) { animation-delay: 0.12s; }
+.eq i:nth-child(3) { animation-delay: 0.24s; }
+.eq i:nth-child(4) { animation-delay: 0.36s; }
+.stage-bar__right { display: flex; gap: var(--sp-4); flex: none; font-variant-numeric: tabular-nums; }
+
+/* ============================== PANELS ============================== */
+.panel { max-width: 1440px; margin: 0 auto; }
+.panel__head { max-width: 62ch; margin-bottom: var(--sp-6); }
+.panel__head h2 { font-size: var(--t-2xl); margin-bottom: var(--sp-3); }
+.panel__head p { color: var(--text-dim); }
+
+.controls { display: grid; gap: var(--sp-6); grid-template-columns: 1fr; }
+@media (min-width: 900px) { .controls { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.control-group { display: grid; gap: var(--sp-3); align-content: start; }
+.control-group--wide { grid-column: 1 / -1; }
+.control-group__label {
+  font-family: var(--font-mono); font-size: var(--t-2xs); letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--text-mute);
+}
+
+.segmented {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: var(--sp-2);
+}
+.segmented button {
+  display: flex; align-items: center; gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4); cursor: pointer;
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+  background: var(--panel); color: var(--text-dim);
+  font-size: var(--t-sm); font-weight: 540; text-align: left;
+  transition: all var(--dur-1) var(--ease);
+}
+.segmented button svg { width: 1.15em; height: 1.15em; flex: none; }
+.segmented button:hover { background: var(--panel-2); color: var(--text); }
+.segmented button.is-active {
+  border-color: color-mix(in hsl, var(--accent) 60%, var(--line));
+  background: color-mix(in hsl, var(--accent) 12%, var(--panel));
+  color: var(--text); box-shadow: var(--sh-1);
+}
+.segmented button.is-active svg { color: var(--accent); }
+
+.swatches { display: flex; flex-wrap: wrap; gap: var(--sp-3); }
+.swatches button {
+  --size: 46px;
+  width: var(--size); height: var(--size); padding: 0; cursor: pointer;
+  border-radius: 50%; border: 2px solid var(--line);
+  background: conic-gradient(from 210deg, var(--s1), var(--s2), var(--s3), var(--s1));
+  transition: transform var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease);
+  position: relative;
+}
+.swatches button:hover { transform: scale(1.08); }
+.swatches button.is-active { border-color: var(--text); transform: scale(1.06); }
+.swatches button.is-active::after {
+  content: ""; position: absolute; inset: -7px; border-radius: 50%;
+  border: 1px solid color-mix(in hsl, var(--accent) 70%, transparent);
+}
+
+/* ---- sliders ---- */
+.slider { display: grid; gap: var(--sp-2); }
+.slider__name {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: var(--t-sm); color: var(--text-dim);
+}
+.slider__name b { font-family: var(--font-mono); font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
+.slider input[type="range"] {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 22px; background: transparent; cursor: pointer;
+}
+.slider input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px; border-radius: 2px;
+  background: linear-gradient(90deg, color-mix(in hsl, var(--accent) 70%, var(--line)), var(--line));
+}
+.slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 16px; height: 16px; margin-top: -6px; border-radius: 50%;
+  background: var(--text); border: 3px solid var(--accent);
+  box-shadow: var(--sh-1); transition: transform var(--dur-1) var(--ease);
+}
+.slider input[type="range"]:hover::-webkit-slider-thumb { transform: scale(1.16); }
+.slider input[type="range"]::-moz-range-track { height: 4px; border-radius: 2px; background: var(--line); }
+.slider input[type="range"]::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--accent); }
+.slider input[type="range"]::-moz-range-thumb {
+  width: 14px; height: 14px; border-radius: 50%; background: var(--text); border: 3px solid var(--accent);
+}
+.slider--tight { gap: var(--sp-1); }
+
+/* ---- toggles ---- */
+.toggles { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+.toggle {
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4); cursor: pointer;
+  border: 1px solid var(--line-soft); border-radius: var(--radius-sm); background: var(--panel);
+  font-size: var(--t-sm); color: var(--text-dim);
+  transition: border-color var(--dur-1) var(--ease), background var(--dur-1) var(--ease);
+}
+.toggle:hover { border-color: var(--line); background: var(--panel-2); }
+.toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
+.toggle span { position: relative; padding-left: 42px; }
+.toggle span::before {
+  content: ""; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  width: 32px; height: 18px; border-radius: var(--radius-pill);
+  background: var(--line); transition: background var(--dur-2) var(--ease);
+}
+.toggle span::after {
+  content: ""; position: absolute; left: 3px; top: 50%; transform: translateY(-50%);
+  width: 12px; height: 12px; border-radius: 50%; background: var(--text-mute);
+  transition: transform var(--dur-2) var(--ease-out), background var(--dur-2) var(--ease);
+}
+.toggle input:checked + span { color: var(--text); }
+.toggle input:checked + span::before { background: color-mix(in hsl, var(--accent) 72%, var(--line)); }
+.toggle input:checked + span::after { transform: translate(14px, -50%); background: var(--accent-ink); }
+.toggle input:focus-visible + span::before { box-shadow: var(--ring); }
+
+/* ============================== SOURCES ============================== */
+.tabs { display: flex; gap: var(--sp-1); border-bottom: 1px solid var(--line-soft); margin-bottom: var(--sp-5); }
+.tabs button {
+  padding: var(--sp-3) var(--sp-5); cursor: pointer; background: none; border: 0;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  color: var(--text-mute); font-size: var(--t-sm); font-weight: 560;
+  transition: color var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease);
+}
+.tabs button:hover { color: var(--text-dim); }
+.tabs button.is-active { color: var(--text); border-bottom-color: var(--accent); }
+.tabpanel { display: none; }
+.tabpanel.is-active { display: block; animation: rise var(--dur-3) var(--ease-out); }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.src-grid { display: grid; gap: var(--sp-5); grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.src-grid--2 { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.src-card {
+  display: grid; gap: var(--sp-3); align-content: start;
+  padding: var(--sp-5); border: 1px solid var(--line-soft); border-radius: var(--radius);
+  background: var(--panel); box-shadow: var(--sh-1);
+  transition: border-color var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease);
+}
+.src-card:hover { border-color: var(--line); box-shadow: var(--sh-2); }
+.src-card h3 { display: flex; align-items: center; gap: var(--sp-2); font-size: var(--t-lg); }
+.src-card__ico { font-size: var(--t-lg); filter: saturate(1.1); }
+.src-card p { color: var(--text-dim); font-size: var(--t-sm); }
+.src-note { font-size: var(--t-xs) !important; color: var(--text-mute) !important; }
+.src-note.is-error { color: var(--accent-3) !important; }
+
+.dropzone {
+  display: grid; place-items: center; gap: var(--sp-2); text-align: center;
+  padding: var(--sp-6) var(--sp-4); cursor: pointer;
+  border: 1.5px dashed var(--line); border-radius: var(--radius);
+  background: var(--panel-2); color: var(--text-dim); font-size: var(--t-sm);
+  transition: border-color var(--dur-2) var(--ease), background var(--dur-2) var(--ease), color var(--dur-2) var(--ease);
+}
+.dropzone:hover, .dropzone.is-over { border-color: var(--accent); color: var(--text); background: color-mix(in hsl, var(--accent) 8%, var(--panel-2)); }
+.dropzone svg { width: 26px; height: 26px; color: var(--accent); }
+.dropzone small { color: var(--text-mute); font-family: var(--font-mono); font-size: var(--t-2xs); }
+/* hover raises every line, so the lift is not carried by the surface alone */
+.dropzone:hover small, .dropzone.is-over small { color: var(--text-dim); }
+.dropzone b { color: var(--text); }
+
+audio { width: 100%; height: 34px; border-radius: var(--radius-sm); }
+select, input[type="url"], textarea {
+  width: 100%; padding: var(--sp-3); border: 1px solid var(--line); border-radius: var(--radius-sm);
+  background: var(--panel-2); color: var(--text); font-size: var(--t-sm);
+  transition: border-color var(--dur-1) var(--ease);
+}
+select:hover, input[type="url"]:hover, textarea:hover { border-color: var(--text-mute); }
+textarea { resize: vertical; font-family: var(--font-mono); font-size: var(--t-xs); line-height: 1.5; }
+.osc-row { display: flex; gap: var(--sp-3); align-items: center; }
+.osc-row > * { flex: 1 1 0; }
+.osc-row .btn { flex: 0 0 auto; }
+
+.scenario-list { display: grid; gap: var(--sp-2); }
+.scenario {
+  display: grid; gap: 1px; text-align: left; padding: var(--sp-3) var(--sp-4); cursor: pointer;
+  border: 1px solid var(--line-soft); border-radius: var(--radius-sm); background: var(--panel-2);
+  transition: all var(--dur-1) var(--ease);
+}
+.scenario b { font-size: var(--t-sm); font-weight: 580; color: var(--text); }
+.scenario span { font-size: var(--t-xs); color: var(--text-mute); }
+.scenario:hover { border-color: var(--line); }
+.scenario.is-active { border-color: color-mix(in hsl, var(--accent) 60%, var(--line)); background: color-mix(in hsl, var(--accent) 10%, var(--panel-2)); }
+.scenario.is-active b { color: var(--accent); }
+
+.code {
+  margin: 0; padding: var(--sp-4); overflow-x: auto;
+  border: 1px solid var(--line-soft); border-radius: var(--radius-sm); background: var(--bg-soft);
+  font-family: var(--font-mono); font-size: var(--t-2xs); line-height: 1.7; color: var(--text-dim);
+}
+
+.readout {
+  display: grid; gap: var(--sp-5); grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  margin-top: var(--sp-5); padding: var(--sp-5);
+  border: 1px solid var(--line-soft); border-radius: var(--radius); background: var(--panel);
+}
+@media (max-width: 720px) { .readout { grid-template-columns: 1fr; } }
+.readout__label {
+  display: block; margin-bottom: var(--sp-2);
+  font-family: var(--font-mono); font-size: var(--t-2xs); letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--text-mute);
+}
+.readout__text { font-size: var(--t-lg); line-height: 1.5; min-height: 1.5em; }
+.readout__text.is-live { color: var(--accent); }
+.phoneme-strip { display: flex; flex-wrap: wrap; gap: var(--sp-2); min-height: 30px; align-items: center; }
+.phoneme-strip i {
+  display: block; width: 7px; border-radius: 3px; background: var(--accent);
+  animation: rise var(--dur-2) var(--ease-out);
+}
+
+.event-log { display: grid; gap: var(--sp-2); margin-top: var(--sp-5); }
+.event-log__row {
+  display: grid; grid-template-columns: 76px 96px 1fr; gap: var(--sp-3); align-items: center;
+  padding: var(--sp-2) var(--sp-3); border-left: 2px solid var(--line);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0; background: var(--panel);
+  font-size: var(--t-sm); color: var(--text-dim);
+  animation: slide-in var(--dur-2) var(--ease-out);
+}
+@keyframes slide-in { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
+.event-log__row[data-kind="thinking"] { border-left-color: var(--accent-2); }
+.event-log__row[data-kind="tool"] { border-left-color: var(--accent); }
+.event-log__row[data-kind="token"] { border-left-color: var(--s3); }
+.event-log__row[data-kind="error"] { border-left-color: hsl(0 74% 58%); }
+.event-log__row[data-kind="done"] { border-left-color: var(--text-mute); }
+.event-log__time { font-family: var(--font-mono); font-size: var(--t-2xs); color: var(--text-mute); }
+.event-log__kind { font-family: var(--font-mono); font-size: var(--t-2xs); text-transform: uppercase; letter-spacing: 0.08em; }
+.event-log__msg { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ============================== NOTES ============================== */
+.notes-grid { display: grid; gap: var(--sp-5); grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.notes-grid article {
+  padding: var(--sp-5); border: 1px solid var(--line-soft); border-radius: var(--radius);
+  background: var(--panel); box-shadow: var(--sh-1);
+}
+.notes-grid h3 { font-size: var(--t-md); margin-bottom: var(--sp-2); }
+.notes-grid p { font-size: var(--t-sm); color: var(--text-dim); }
+
+/* ============================== FOOTER ============================== */
+.footer {
+  display: flex; flex-wrap: wrap; gap: var(--sp-4); align-items: center; justify-content: space-between;
+  padding: var(--sp-6) clamp(var(--sp-4), 4vw, var(--sp-7));
+  border-top: 1px solid var(--line-soft); color: var(--text-mute); font-size: var(--t-sm);
+}
+.footer__left, .footer__right { display: flex; align-items: center; gap: var(--sp-3); }
+.footer a { color: var(--text-dim); border-bottom: 1px solid var(--line); }
+.footer a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.footer b { color: var(--text); }
+
+/* ============================== TOAST ============================== */
+.toast {
+  position: fixed; left: 50%; bottom: var(--sp-6); z-index: 60;
+  transform: translate(-50%, 160%);
+  padding: var(--sp-3) var(--sp-5); border-radius: var(--radius-pill);
+  border: 1px solid var(--line); background: var(--panel-2); box-shadow: var(--sh-3);
+  font-size: var(--t-sm); color: var(--text); white-space: nowrap;
+  transition: transform var(--dur-3) var(--ease-out), opacity var(--dur-3) var(--ease);
+  opacity: 0; pointer-events: none;
+}
+.toast.is-show { transform: translate(-50%, 0); opacity: 1; }
+
+/* ============================== RESPONSIVE ============================== */
+@media (max-width: 1080px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero__viz { order: -1; }
+  .topbar__nav { display: none; }
+}
+@media (max-width: 640px) {
+  .segmented { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stat-row { gap: var(--sp-5); }
+  .tabs { overflow-x: auto; }
+  .tabs button { padding: var(--sp-3) var(--sp-4); }
+  .event-log__row { grid-template-columns: 64px 1fr; }
+  .event-log__msg { grid-column: 1 / -1; }
+  /* the share label is the only thing that pushes the topbar past 390px */
+  #btn-share { padding: var(--sp-2); }
+  #btn-share svg { width: 1.2em; height: 1.2em; }
+  #btn-share span, #btn-share .btn__label { display: none; }
+  .topbar { gap: var(--sp-3); }
+}
+
+@media (max-width: 420px) {
+  .topbar__brand .pill { display: none; }
+}
+
+/* ============================== A11Y ============================== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+}
+
+</style>
+</head>
+<body>
+<a class="skip-link" href="#stage">Lompat ke panggung visual</a>
+
+<header class="topbar">
+  <div class="topbar__brand">
+    <span class="logo" aria-hidden="true">
+      <i></i><i></i><i></i><i></i><i></i>
+    </span>
+    <div class="wordmark">
+      <span class="wordmark__a">Uni</span><span class="wordmark__b">fier</span>
+    </div>
+    <span class="pill">eksperimen v1</span>
+  </div>
+
+  <nav class="topbar__nav" aria-label="Bagian halaman">
+    <a href="#stage">Panggung</a>
+    <a href="#kontrol">Kontrol</a>
+    <a href="#sumber">Sumber</a>
+    <a href="#catatan">Catatan</a>
+  </nav>
+
+  <div class="topbar__actions">
+    <button id="btn-share" class="btn btn--ghost" type="button" title="Salin tautan preset saat ini">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M12 3v12M8 7l4-4 4 4"/></svg>
+      <span class="btn__label">Bagikan</span>
+    </button>
+    <button id="btn-theme" class="btn btn--icon" type="button" aria-label="Ganti tema terang/gelap">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+  <!-- ============================= HERO / STAGE ============================= -->
+  <section class="hero" id="stage">
+    <div class="hero__copy">
+      <p class="eyebrow"><span class="dot"></span> Unifier · real-time audio → visual</p>
+      <h1>Suara menjadi <em>bentuk</em>,<br>sinyal menjadi <em>gerak</em>.</h1>
+      <p class="lede">
+        Ini eksperimen <strong>Unifier</strong>: mesin visualisasi buatan sendiri yang membaca
+        audio, ucapan, dan sinyal agen AI — lalu mengubahnya menjadi efek visual yang
+        bergerak pada 60&nbsp;fps di browser. Tanpa library visual, tanpa WebGL.
+      </p>
+      <div class="hero__actions">
+        <button id="btn-start" class="btn btn--primary" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
+          Mulai mikrofon
+        </button>
+        <button id="btn-demo" class="btn btn--outline" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg>
+          Coba tanpa mikrofon
+        </button>
+        <button id="btn-rec" class="btn btn--outline" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6"/></svg>
+          Rekam
+        </button>
+        <button id="btn-full" class="btn btn--icon" type="button" aria-label="Mode layar penuh">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V5a1 1 0 0 1 1-1h4M20 9V5a1 1 0 0 0-1-1h-4M4 15v4a1 1 0 0 0 1 1h4M20 15v4a1 1 0 0 1-1 1h-4"/></svg>
+        </button>
+      </div>
+      <ul class="stat-row" id="stat-row">
+        <li><b id="stat-fps">—</b><span>fps</span></li>
+        <li><b id="stat-modes">6</b><span>modus visual</span></li>
+        <li><b id="stat-latency">—</b><span>ms latensi</span></li>
+        <li><b id="stat-peak">—</b><span>Hz puncak</span></li>
+      </ul>
+    </div>
+
+    <div class="hero__viz">
+      <div class="stage-wrap" id="stage-wrap">
+        <canvas id="stage-canvas" width="1280" height="720" aria-label="Kanvas visualisasi suara"></canvas>
+        <div class="stage-glow" aria-hidden="true"></div>
+        <div class="hud" id="hud" aria-hidden="true">
+          <span class="hud__tick tl"></span><span class="hud__tick tr"></span>
+          <span class="hud__tick bl"></span><span class="hud__tick br"></span>
+          <span class="hud__line"></span>
+          <span class="hud__tag">unifier · live</span>
+          <span class="hud__mode" id="hud-mode">BARS</span>
+          <span class="hud__scale"><i>20 Hz</i><i>1 kHz</i><i>16 kHz</i></span>
+        </div>
+        <div class="stage-overlay" id="stage-overlay">
+          <div class="stage-overlay__inner">
+            <span class="logo logo--lg" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+            <p class="stage-overlay__title">Panggung visual siap</p>
+            <p class="stage-overlay__hint">Tekan <kbd>M</kbd> untuk mikrofon, <kbd>D</kbd> untuk mode demo.</p>
+          </div>
+        </div>
+      </div>
+      <div class="stage-bar">
+        <div class="now-playing">
+          <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+          <span id="now-playing">Menunggu sumber sinyal…</span>
+        </div>
+        <div class="stage-bar__right">
+          <span class="mono" id="meter-label">-∞ dB</span>
+          <span class="mono dim" id="engine-label">idle</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= KONTROL ============================= -->
+  <section class="panel" id="kontrol">
+    <header class="panel__head">
+      <h2>Kontrol visual</h2>
+      <p>Semua perubahan langsung terlihat di panggung. Setiap kontrol bisa dibagikan lewat tautan.</p>
+    </header>
+
+    <div class="controls">
+      <div class="control-group">
+        <span class="control-group__label">Modus</span>
+        <div class="segmented" id="mode-picker" role="radiogroup" aria-label="Modus visualisasi">
+          <button type="button" role="radio" data-mode="bars" aria-checked="true" class="is-active">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M9 20V4M14 20v-9M19 20V7"/></svg> Spektrum
+          </button>
+          <button type="button" role="radio" data-mode="wave" aria-checked="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12c3-8 5-8 8 0s5 8 8 0"/></svg> Gelombang
+          </button>
+          <button type="button" role="radio" data-mode="radial" aria-checked="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v6M12 15v6M3 12h6M15 12h6"/></svg> Radial
+          </button>
+          <button type="button" role="radio" data-mode="particles" aria-checked="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h.01M18 8h.01M10 18h.01M16 16h.01M12 10h.01"/></svg> Partikel
+          </button>
+          <button type="button" role="radio" data-mode="tunnel" aria-checked="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v12H4zM8 9.5h8v5H8z"/></svg> Terowongan
+          </button>
+          <button type="button" role="radio" data-mode="unified" aria-checked="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 6-9 6-9-6zM3 15l9 6 9-6"/></svg> Unified
+          </button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <span class="control-group__label">Palet</span>
+        <div class="swatches" id="palette-picker" role="radiogroup" aria-label="Palet warna">
+          <button type="button" role="radio" data-palette="aurora" aria-checked="true" class="is-active" style="--s1:#2dd4bf;--s2:#6366f1;--s3:#f472b6"></button>
+          <button type="button" role="radio" data-palette="ember" aria-checked="false" style="--s1:#fbbf24;--s2:#f97316;--s3:#ef4444"></button>
+          <button type="button" role="radio" data-palette="ion" aria-checked="false" style="--s1:#22d3ee;--s2:#3b82f6;--s3:#a855f7"></button>
+          <button type="button" role="radio" data-palette="moss" aria-checked="false" style="--s1:#a3e635;--s2:#14b8a6;--s3:#0ea5e9"></button>
+          <button type="button" role="radio" data-palette="mono" aria-checked="false" style="--s1:#e2e8f0;--s2:#94a3b8;--s3:#475569"></button>
+        </div>
+      </div>
+
+      <div class="control-group control-group--wide">
+        <label class="slider" for="ctl-sensitivity">
+          <span class="slider__name">Sensitivitas <b id="val-sensitivity">1.0×</b></span>
+          <input id="ctl-sensitivity" type="range" min="0.3" max="3" step="0.05" value="1">
+        </label>
+        <label class="slider" for="ctl-smoothing">
+          <span class="slider__name">Kehalusan <b id="val-smoothing">0.82</b></span>
+          <input id="ctl-smoothing" type="range" min="0" max="0.96" step="0.01" value="0.82">
+        </label>
+        <label class="slider" for="ctl-complexity">
+          <span class="slider__name">Kompleksitas <b id="val-complexity">1.0×</b></span>
+          <input id="ctl-complexity" type="range" min="0.35" max="2" step="0.05" value="1">
+        </label>
+        <label class="slider" for="ctl-speed">
+          <span class="slider__name">Kecepatan <b id="val-speed">1.0×</b></span>
+          <input id="ctl-speed" type="range" min="0.2" max="3" step="0.05" value="1">
+        </label>
+        <label class="slider" for="ctl-trails">
+          <span class="slider__name">Jejak <b id="val-trails">0.88</b></span>
+          <input id="ctl-trails" type="range" min="0" max="0.99" step="0.01" value="0.88">
+        </label>
+      </div>
+
+      <div class="control-group control-group--wide toggles">
+        <label class="toggle"><input type="checkbox" id="tgl-grid" checked><span>Kisi latar</span></label>
+        <label class="toggle"><input type="checkbox" id="tgl-glow" checked><span>Glow</span></label>
+        <label class="toggle"><input type="checkbox" id="tgl-mirror" checked><span>Cermin bawah</span></label>
+        <label class="toggle"><input type="checkbox" id="tgl-labels"><span>Label frekuensi</span></label>
+        <label class="toggle"><input type="checkbox" id="tgl-reduce" checked><span>Hormati <span class="mono">prefers-reduced-motion</span></span></label>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= SUMBER ============================= -->
+  <section class="panel" id="sumber">
+    <header class="panel__head">
+      <h2>Sumber sinyal</h2>
+      <p>Tiga masukan berbeda, satu mesin analisis. Ini inti ide “Unifier”.</p>
+    </header>
+
+    <div class="tabs" role="tablist" aria-label="Sumber sinyal">
+      <button role="tab" id="tab-audio" aria-controls="src-audio" aria-selected="true" class="is-active">Audio</button>
+      <button role="tab" id="tab-speech" aria-controls="src-speech" aria-selected="false">Ucapan</button>
+      <button role="tab" id="tab-agent" aria-controls="src-agent" aria-selected="false">Sinyal Agen</button>
+    </div>
+
+    <div class="tabpanels">
+      <div class="tabpanel is-active" role="tabpanel" id="src-audio" aria-labelledby="tab-audio">
+        <div class="src-grid">
+          <article class="src-card">
+            <h3><span class="src-card__ico">🎙️</span> Mikrofon perangkat</h3>
+            <p>Input langsung dari perangkat. Paling cocok untuk menguji tepukan, tepuk tangan, atau musik dari speaker.</p>
+            <button id="btn-mic" class="btn btn--primary btn--block" type="button">Nyalakan mikrofon</button>
+            <p class="src-note" id="mic-note">Butuh izin mikrofon. Di <span class="mono">file://</span> browser akan menolak — pakai server lokal.</p>
+          </article>
+
+          <article class="src-card">
+            <h3><span class="src-card__ico">📁</span> Berkas audio</h3>
+            <p>Putar berkas dari komputer. Analisis berjalan di atas elemen media, jadi durasi panjang tetap ringan.</p>
+            <label class="dropzone" id="dropzone">
+              <input id="file-input" type="file" accept="audio/*" hidden>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>
+              <span>Tarik berkas ke sini atau <b>pilih berkas</b></span>
+              <small>mp3 · wav · ogg · m4a</small>
+            </label>
+            <audio id="audio-el" controls preload="metadata"></audio>
+          </article>
+
+          <article class="src-card">
+            <h3><span class="src-card__ico">🎛️</span> Generator uji</h3>
+            <p>Nada sintetis tanpa input apa pun. Berguna untuk kalibrasi: sapuan frekuensi, denyut, dan derau.</p>
+            <div class="osc-row">
+              <select id="osc-type" aria-label="Bentuk gelombang">
+                <option value="sweep">Sapuan frekuensi</option>
+                <option value="pulse">Denyut ritmis</option>
+                <option value="noise">Derau</option>
+                <option value="chord">Akord</option>
+              </select>
+              <label class="slider slider--tight" for="osc-freq">
+                <span class="slider__name">Frekuensi <b id="val-osc-freq">220 Hz</b></span>
+                <input id="osc-freq" type="range" min="40" max="2000" step="10" value="220">
+              </label>
+            </div>
+            <button id="btn-osc" class="btn btn--outline btn--block" type="button">Jalankan generator</button>
+          </article>
+        </div>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="src-speech" aria-labelledby="tab-speech">
+        <div class="src-grid src-grid--2">
+          <article class="src-card">
+            <h3><span class="src-card__ico">🗣️</span> Ucapan langsung</h3>
+            <p>Rekognisi suara browser. Teks hasil dikenali dikirim ke mesin visual sebagai sinyal <em>fonem</em> — setiap kata memicu denyut.</p>
+            <button id="btn-speech" class="btn btn--primary btn--block" type="button">Mulai mendengarkan</button>
+            <p class="src-note" id="speech-note">Dukungan <span class="mono">SpeechRecognition</span> bergantung browser (terbaik di Chrome/Edge).</p>
+          </article>
+
+          <article class="src-card">
+            <h3><span class="src-card__ico">🔊</span> Ucapkan teks</h3>
+            <p>Ubah teks menjadi suara, lalu visualisasikan. Envelope ucapan buatan ini dipakai untuk menguji respons tanpa mikrofon.</p>
+            <textarea id="tts-text" rows="3" spellcheck="false">Unifier menyatukan audio, ucapan, dan sinyal agen menjadi satu panggung visual.</textarea>
+            <div class="osc-row">
+              <select id="tts-lang" aria-label="Bahasa ucapan">
+                <option value="id-ID">Indonesia</option>
+                <option value="en-US">English (US)</option>
+                <option value="ja-JP">日本語</option>
+              </select>
+              <button id="btn-tts" class="btn btn--outline" type="button">Ucapkan</button>
+            </div>
+          </article>
+        </div>
+
+        <div class="readout" id="speech-readout">
+          <div class="readout__main">
+            <span class="readout__label">Transkrip</span>
+            <p id="transcript" class="readout__text">— belum ada ucapan —</p>
+          </div>
+          <div class="readout__side">
+            <span class="readout__label">Sinyal fonem</span>
+            <div class="phoneme-strip" id="phoneme-strip" aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="src-agent" aria-labelledby="tab-agent">
+        <div class="src-grid src-grid--2">
+          <article class="src-card">
+            <h3><span class="src-card__ico">🤖</span> Simulasi agen</h3>
+            <p>Jalankan skenario siklus hidup agen AI. Setiap peristiwa punya “tanda tangan” visual sendiri.</p>
+            <div class="scenario-list" id="scenario-list">
+              <button type="button" class="scenario is-active" data-scenario="lifecycle">
+                <b>Siklus hidup</b><span>berpikir → alat → menjawab → selesai</span>
+              </button>
+              <button type="button" class="scenario" data-scenario="burst">
+                <b>Ledakan token</b><span>aliran keluaran cepat &amp; padat</span>
+              </button>
+              <button type="button" class="scenario" data-scenario="error">
+                <b>Galat &amp; pemulihan</b><span>kegagalan, lalu pulih</span>
+              </button>
+            </div>
+            <div class="osc-row">
+              <button id="btn-scenario" class="btn btn--primary" type="button">Putar skenario</button>
+              <button id="btn-scenario-stop" class="btn btn--ghost" type="button">Hentikan</button>
+            </div>
+          </article>
+
+          <article class="src-card">
+            <h3><span class="src-card__ico">🔌</span> Aliran langsung</h3>
+            <p>Hubungkan ke WebSocket yang memancarkan peristiwa JSON. Cocok untuk menyambung ke agen sungguhan.</p>
+            <div class="osc-row">
+              <input id="ws-url" type="url" placeholder="ws://localhost:8787/events" spellcheck="false">
+              <button id="btn-ws" class="btn btn--outline" type="button">Sambung</button>
+            </div>
+            <pre class="code" id="ws-sample">{ "type": "thinking", "intensity": 0.7 }
+{ "type": "tool", "name": "browser.search" }
+{ "type": "token", "text": "hasil" }
+{ "type": "error", "message": "timeout" }
+{ "type": "done" }</pre>
+            <p class="src-note">Server contoh: <span class="mono">node tools/ws-server.mjs</span></p>
+          </article>
+        </div>
+
+        <div class="event-log" id="event-log" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= CATATAN ============================= -->
+  <section class="panel panel--notes" id="catatan">
+    <header class="panel__head">
+      <h2>Catatan eksperimen</h2>
+      <p>Apa yang diuji, apa yang sengaja tidak dipakai, dan apa yang berikutnya.</p>
+    </header>
+
+    <div class="notes-grid">
+      <article>
+        <h3>Mengapa tanpa WebGL</h3>
+        <p>Semua gambar dilukis dengan Canvas 2D dan <span class="mono">requestAnimationFrame</span>. Tujuannya agar mesin bisa dibaca dan dimodifikasi di satu berkas, dan tetap jalan di perangkat tanpa GPU.</p>
+      </article>
+      <article>
+        <h3>Analisis yang dipakai</h3>
+        <p><span class="mono">AnalyserNode</span> dengan FFT 2048: magnitudo → dB → pita logaritmik, ditambah deteksi puncak dan deteksi ketukan dari energi pita rendah.</p>
+      </article>
+      <article>
+        <h3>Redaman temporal</h3>
+        <p>Nilai pita memakai serangan cepat / pelepasan lambat supaya batang tidak berkedip, sementara puncak punya peluruhan sendiri agar terbaca seperti VU meter.</p>
+      </article>
+      <article>
+        <h3>Peristiwa agen sebagai “instrumen”</h3>
+        <p><span class="mono">thinking</span> memicu denyut rendah, <span class="mono">tool</span> memicu kilatan, <span class="mono">token</span> menambah partikel, <span class="mono">error</span> memicu guncangan merah.</p>
+      </article>
+      <article>
+        <h3>Berikutnya</h3>
+        <p>Perekaman WebM langsung dari kanvas sudah ada. Langkah lanjut: peta peristiwa yang bisa dikonfigurasi, keluaran MIDI, dan modus dua kanal untuk kiri/kanan.</p>
+      </article>
+      <article>
+        <h3>Bagikan preset</h3>
+        <p>Setiap kontrol ditulis ke URL. Tombol <b>Bagikan</b> menyalin tautan yang membuka ulang panggung persis seperti yang Anda lihat.</p>
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="footer__left">
+    <span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+    <span><b>Unifier</b> · eksperimen visualisasi suara</span>
+  </div>
+  <div class="footer__right">
+    <span class="mono dim">Canvas 2D · Web Audio · tanpa dependensi</span>
+    <a href="https://github.com/antono4/VisualisasiSuaraReal-timeUnifier">Sumber</a>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+/* Unifier — audio engine
+   Web Audio analysis: FFT -> log bands -> temporal envelope -> beat/onset detection.
+   Also a fully synthetic engine, so the visualizers can run with no input at all. */
+
+const BAND_COUNT = 64;
+const FFT_SIZE = 2048;
+const F_MIN = 38;
+const F_MAX = 16000;
+
+const clamp = (v, a = 0, b = 1) => (v < a ? a : v > b ? b : v);
+const lerp = (a, b, t) => a + (b - a) * t;
+
+/* ------------------------------------------------------------------ */
+/* Feature frame — the single currency of the whole system.            */
+/* ------------------------------------------------------------------ */
+function makeFrame() {
+  return {
+    t: 0,
+    dt: 1 / 60,
+    active: false,
+    source: "idle",
+    level: 0,
+    db: -90,
+    bands: new Float32Array(BAND_COUNT),
+    peaks: new Float32Array(BAND_COUNT),
+    wave: new Float32Array(1024),
+    centroid: 0,
+    flux: 0,
+    beat: 0,
+    bpm: 0,
+    /* layered event envelopes (0..1, decaying) */
+    pulse: 0,
+    flashTool: 0,
+    flashError: 0,
+    flashDone: 0,
+    speech: 0,
+    tokens: 0,
+  };
+}
+
+/* ------------------------------------------------------------------ */
+/* Real audio analysis                                                 */
+/* ------------------------------------------------------------------ */
+class AudioEngine {
+  constructor() {
+    this.ctx = null;
+    this.analyser = null;
+    this.gain = null;
+    this.sourceNode = null;
+    this.mode = "idle";        // idle | mic | file | osc
+    this.stream = null;
+    this.osc = null;
+    this.oscKind = "sweep";
+    this.freqData = null;
+    this.timeData = null;
+    this.bands = new Float32Array(BAND_COUNT);
+    this.peaks = new Float32Array(BAND_COUNT);
+    this.bandEdges = null;
+    this.energyHistory = [];
+    this.lastBeat = 0;
+    this.beatIntervals = [];
+    this.bpm = 0;
+    this.prevSpectrum = null;
+    this.fluxSmooth = 0;
+    this.levelSmooth = 0;
+    this.sensitivity = 1;
+    this.smoothing = 0.82;
+    this.onSourceChange = null;
+  }
+
+  async ensureContext() {
+    if (!this.ctx) {
+      const Ctor = window.AudioContext || window.webkitAudioContext;
+      if (!Ctor) throw new Error("Web Audio tidak didukung browser ini.");
+      this.ctx = new Ctor({ latencyHint: "interactive" });
+      this.analyser = this.ctx.createAnalyser();
+      this.analyser.fftSize = FFT_SIZE;
+      this.analyser.smoothingTimeConstant = 0.6;
+      this.analyser.minDecibels = -96;
+      this.analyser.maxDecibels = -6;
+      this.gain = this.ctx.createGain();
+      this.gain.gain.value = 1;
+      this.gain.connect(this.analyser);
+      this.freqData = new Uint8Array(this.analyser.frequencyBinCount);
+      this.timeData = new Float32Array(this.analyser.fftSize);
+      this.bandEdges = this._makeBandEdges();
+    }
+    if (this.ctx.state === "suspended") await this.ctx.resume();
+    return this.ctx;
+  }
+
+  _makeBandEdges() {
+    const nyquist = this.ctx.sampleRate / 2;
+    const bins = this.analyser.frequencyBinCount;
+    const edges = new Int32Array(BAND_COUNT + 1);
+    for (let i = 0; i <= BAND_COUNT; i++) {
+      const f = F_MIN * Math.pow(F_MAX / F_MIN, i / BAND_COUNT);
+      edges[i] = clamp(Math.round((f / nyquist) * bins), 0, bins - 1);
+      if (i > 0 && edges[i] <= edges[i - 1]) edges[i] = edges[i - 1] + 1;
+    }
+    edges[BAND_COUNT] = bins;
+    return edges;
+  }
+
+  async startMic() {
+    await this.ensureContext();
+    this.stop();
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
+    });
+    this.stream = stream;
+    this.sourceNode = this.ctx.createMediaStreamSource(stream);
+    this.sourceNode.connect(this.gain);
+    this.mode = "mic";
+    this._notify("Mikrofon perangkat");
+  }
+
+  async startElement(el) {
+    await this.ensureContext();
+    this.stop();
+    if (!el.__unifierNode) el.__unifierNode = this.ctx.createMediaElementSource(el);
+    this.sourceNode = el.__unifierNode;
+    this.sourceNode.connect(this.gain);
+    el.__unifierNode.connect(this.ctx.destination); // keep it audible
+    this.mode = "file";
+    this._notify("Berkas audio");
+  }
+
+  async startOsc(kind, freq) {
+    await this.ensureContext();
+    this.stop();
+    this.oscKind = kind;
+    this.osc = new OscillatorBank(this.ctx, this.gain, kind, freq);
+    this.osc.start();
+    this.mode = "osc";
+    this._notify("Generator uji · " + kind);
+  }
+
+  stop() {
+    if (this.stream) {
+      this.stream.getTracks().forEach((t) => t.stop());
+      this.stream = null;
+    }
+    if (this.osc) {
+      this.osc.stop();
+      this.osc = null;
+    }
+    if (this.sourceNode) {
+      try { this.sourceNode.disconnect(); } catch (e) { /* already gone */ }
+      this.sourceNode = null;
+    }
+    if (this.mode !== "idle") this._notify(null);
+    this.mode = "idle";
+  }
+
+  _notify(label) { if (this.onSourceChange) this.onSourceChange(label, this.mode); }
+
+  get latencyMs() {
+    if (!this.ctx) return 0;
+    const base = (this.ctx.baseLatency || 0) + (this.ctx.outputLatency || 0);
+    return Math.round(base * 1000);
+  }
+
+  /** Pull one analysis frame into `out`. Returns true when real data was available. */
+  read(out) {
+    if (!this.analyser || this.mode === "idle") return false;
+    this.analyser.getByteFrequencyData(this.freqData);
+    this.analyser.getFloatTimeDomainData(this.timeData);
+
+    const edges = this.bandEdges;
+    const attack = 0.55 - this.smoothing * 0.5;
+    const release = 0.985 - this.smoothing * 0.35;
+
+    let sum = 0;
+    let peak = 0;
+    for (let i = 0; i < BAND_COUNT; i++) {
+      const a = edges[i];
+      const b = edges[i + 1];
+      let acc = 0;
+      for (let k = a; k < b; k++) acc += this.freqData[k];
+      const norm = acc / Math.max(1, b - a) / 255;
+      const v = clamp(Math.pow(norm, 0.85) * this.sensitivity);
+      const prev = this.bands[i];
+      this.bands[i] = v > prev ? lerp(prev, v, 1 - attack) : lerp(prev, v, 1 - release);
+      this.peaks[i] = Math.max(this.peaks[i] - 0.006, this.bands[i]);
+      sum += this.bands[i];
+      if (this.bands[i] > peak) peak = this.bands[i];
+    }
+    out.bands.set(this.bands);
+    out.peaks.set(this.peaks);
+
+    /* waveform, decimated to 1024 samples for cheap drawing */
+    const wave = out.wave;
+    const step = Math.floor(this.timeData.length / wave.length);
+    for (let i = 0; i < wave.length; i++) wave[i] = this.timeData[i * step] || 0;
+
+    /* spectral centroid + flux (perceptual "brightness" and "motion") */
+    let num = 0;
+    let den = 0;
+    let flux = 0;
+    if (!this.prevSpectrum) this.prevSpectrum = new Uint8Array(this.freqData.length);
+    for (let k = 1; k < this.freqData.length; k++) {
+      const m = this.freqData[k] / 255;
+      num += m * k;
+      den += m;
+      const d = m - this.prevSpectrum[k] / 255;
+      if (d > 0) flux += d;
+      this.prevSpectrum[k] = this.freqData[k];
+    }
+    out.centroid = den > 0 ? clamp(num / den / this.freqData.length) : 0;
+    out.flux = clamp(flux / 8);
+    this.fluxSmooth = lerp(this.fluxSmooth, out.flux, 0.25);
+    out.flux = this.fluxSmooth;
+
+    /* RMS level */
+    let rms = 0;
+    for (let i = 0; i < this.timeData.length; i++) rms += this.timeData[i] * this.timeData[i];
+    rms = Math.sqrt(rms / this.timeData.length);
+    const target = clamp(rms * 3.2 * this.sensitivity);
+    this.levelSmooth = target > this.levelSmooth ? lerp(this.levelSmooth, target, 0.4) : lerp(this.levelSmooth, target, 0.12);
+    out.level = this.levelSmooth;
+    out.db = 20 * Math.log10(Math.max(1e-5, this.levelSmooth));
+
+    /* beat: low-band energy vs. rolling mean, with a refractory window */
+    const low = (this.bands[0] + this.bands[1] + this.bands[2] + this.bands[3]) / 4;
+    this.energyHistory.push(low);
+    if (this.energyHistory.length > 43) this.energyHistory.shift();
+    const mean = this.energyHistory.reduce((a, b) => a + b, 0) / this.energyHistory.length;
+    const now = performance.now();
+    if (low > mean * 1.32 && low > 0.12 && now - this.lastBeat > 190) {
+      const gap = now - this.lastBeat;
+      if (this.lastBeat && gap < 2000) {
+        this.beatIntervals.push(gap);
+        if (this.beatIntervals.length > 12) this.beatIntervals.shift();
+        const avg = this.beatIntervals.reduce((a, b) => a + b, 0) / this.beatIntervals.length;
+        this.bpm = Math.round(60000 / avg);
+      }
+      this.lastBeat = now;
+      out.beat = 1;
+    } else {
+      out.beat = Math.max(0, out.beat - out.dt * 4.5);
+    }
+    out.bpm = this.bpm;
+    out.active = true;
+    return true;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Oscillator bank — a calibration signal generator                    */
+/* ------------------------------------------------------------------ */
+class OscillatorBank {
+  constructor(ctx, dest, kind, freq) {
+    this.ctx = ctx;
+    this.dest = dest;
+    this.kind = kind;
+    this.freq = freq || 220;
+    this.nodes = [];
+    this.lfo = null;
+  }
+
+  start() {
+    const ctx = this.ctx;
+    if (this.kind === "noise") {
+      const len = ctx.sampleRate * 2;
+      const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      src.loop = true;
+      const filter = ctx.createBiquadFilter();
+      filter.type = "bandpass";
+      filter.frequency.value = this.freq;
+      filter.Q.value = 0.8;
+      src.connect(filter).connect(this.dest);
+      src.start();
+      this.nodes.push(src, filter);
+      return;
+    }
+
+    if (this.kind === "pulse") {
+      const carrier = ctx.createOscillator();
+      carrier.type = "triangle";
+      carrier.frequency.value = this.freq;
+      const gate = ctx.createGain();
+      gate.gain.value = 0;
+      carrier.connect(gate).connect(this.dest);
+      carrier.start();
+      this.lfo = ctx.createOscillator();
+      this.lfo.type = "square";
+      this.lfo.frequency.value = 2.4;
+      const depth = ctx.createGain();
+      depth.gain.value = 0.5;
+      this.lfo.connect(depth).connect(gate.gain);
+      this.lfo.start();
+      this.nodes.push(carrier, gate, this.lfo, depth);
+      return;
+    }
+
+    const freqs = this.kind === "chord" ? [this.freq, this.freq * 1.26, this.freq * 1.5] : [this.freq];
+    freqs.forEach((f, i) => {
+      const osc = ctx.createOscillator();
+      osc.type = i === 0 ? "sawtooth" : "sine";
+      osc.frequency.value = f;
+      const g = ctx.createGain();
+      g.gain.value = i === 0 ? 0.32 : 0.16;
+      osc.connect(g).connect(this.dest);
+      osc.start();
+      this.nodes.push(osc, g);
+    });
+
+    if (this.kind === "sweep") {
+      const osc = this.nodes[0];
+      const t0 = ctx.currentTime;
+      osc.frequency.setValueAtTime(this.freq, t0);
+      osc.frequency.linearRampToValueAtTime(Math.min(6000, this.freq * 8), t0 + 3.2);
+      osc.frequency.linearRampToValueAtTime(this.freq, t0 + 6.4);
+      const loop = () => {
+        if (!this.nodes.length) return;
+        const t = ctx.currentTime;
+        osc.frequency.setValueAtTime(this.freq, t);
+        osc.frequency.linearRampToValueAtTime(Math.min(6000, this.freq * 8), t + 3.2);
+        osc.frequency.linearRampToValueAtTime(this.freq, t + 6.4);
+        this.sweepTimer = setTimeout(loop, 6400);
+      };
+      this.sweepTimer = setTimeout(loop, 6400);
+    }
+  }
+
+  stop() {
+    if (this.sweepTimer) clearTimeout(this.sweepTimer);
+    this.nodes.forEach((n) => {
+      try { if (n.stop) n.stop(); } catch (e) { /* already stopped */ }
+      try { n.disconnect(); } catch (e) { /* already gone */ }
+    });
+    this.nodes = [];
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Synthetic engine — no audio device required                         */
+/* Deterministic, audio-like output driven by the clock + event input. */
+/* ------------------------------------------------------------------ */
+class SyntheticEngine {
+  constructor() {
+    this.on = false;
+    this.kind = "demo";     // demo | tts | agent
+    this.bands = new Float32Array(BAND_COUNT);
+    this.peaks = new Float32Array(BAND_COUNT);
+    this.t = 0;
+    this.phrase = 0;
+    this.energy = 0;
+    this.energyTarget = 0.35;
+    this.beat = 0;
+    this.bpm = 96;
+    this.seed = Math.random() * 1000;
+    this.voice = 0;
+  }
+
+  start(kind) {
+    this.on = true;
+    this.kind = kind || "demo";
+    this.t = 0;
+    this.seed = Math.random() * 1000;
+  }
+
+  stop() { this.on = false; }
+
+  /** Speech-like envelope: syllable bursts inside phrase-length pauses. */
+  speechEnvelope(t) {
+    const phrase = 1.6 + 0.9 * Math.sin(t * 0.31 + this.seed);
+    const inPhrase = (t % phrase) < phrase * 0.78;
+    if (!inPhrase) return 0;
+    const syl = 0.5 + 0.5 * Math.sin(t * 9.4 + Math.sin(t * 3.1) * 1.6);
+    const shape = Math.pow(Math.abs(Math.sin(t * 4.7)), 0.6);
+    return clamp(syl * shape);
+  }
+
+  read(out) {
+    if (!this.on) return false;
+    const dt = out.dt;
+    this.t += dt;
+
+    const speech = this.kind === "tts" ? this.speechEnvelope(this.t) : 0;
+    this.energyTarget = this.kind === "tts"
+      ? 0.18 + speech * 0.8
+      : this.kind === "agent"
+        ? 0.1 + out.pulse * 0.7 + out.speech * 0.5
+        : 0.22 + this.speechEnvelope(this.t) * 0.7;
+    this.energy = lerp(this.energy, this.energyTarget, 0.22);
+
+    const brightness = this.kind === "tts" ? 0.32 + speech * 0.3 : 0.3 + 0.35 * (0.5 + 0.5 * Math.sin(this.t * 0.21));
+    for (let i = 0; i < BAND_COUNT; i++) {
+      const x = i / (BAND_COUNT - 1);
+      /* log-bell spectrum tilted by brightness, with per-band shimmer */
+      const centre = brightness;
+      const bell = Math.exp(-Math.pow((x - centre) / 0.3, 2));
+      const tilt = Math.pow(1 - x * 0.72, 0.9);
+      const shimmer = 0.82 + 0.18 * Math.sin(this.t * (5.5 + i * 0.13) + i * 0.7 + this.seed);
+      const v = clamp(bell * tilt * shimmer * this.energy);
+      const prev = this.bands[i];
+      this.bands[i] = v > prev ? lerp(prev, v, 0.5) : lerp(prev, v, 0.18);
+      this.peaks[i] = Math.max(this.peaks[i] - 0.007, this.bands[i]);
+    }
+    out.bands.set(this.bands);
+    out.peaks.set(this.peaks);
+
+    const wave = out.wave;
+    const amp = this.energy * 0.85;
+    for (let i = 0; i < wave.length; i++) {
+      const x = i / wave.length;
+      wave[i] = amp * (
+        Math.sin(x * Math.PI * 2 * 3 + this.t * 2.1) * 0.5 +
+        Math.sin(x * Math.PI * 2 * 7 + this.t * 3.7) * 0.28 +
+        Math.sin(x * Math.PI * 2 * 13 - this.t * 5.3) * 0.16
+      );
+    }
+
+    out.level = this.energy;
+    out.db = 20 * Math.log10(Math.max(1e-5, this.energy));
+    out.centroid = clamp(brightness + out.pulse * 0.2);
+    out.flux = clamp(this.energy * 0.6 + out.pulse * 0.5);
+
+    this.beat -= dt * 3.6;
+    if (this.kind !== "tts" && Math.sin(this.t * (this.bpm / 60) * Math.PI * 2) > 0.97) this.beat = 1;
+    if (this.kind === "tts" && speech > 0.86 && Math.random() < 0.06) this.beat = 1;
+    out.beat = Math.max(0, this.beat);
+    out.bpm = this.bpm;
+    out.active = true;
+    return true;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Unifier — merges every source into one frame                        */
+/* ------------------------------------------------------------------ */
+class Unifier {
+  constructor() {
+    this.sensitivity = 1;
+    this.smoothing = 0.82;
+    this.audio = new AudioEngine();
+    this.synth = new SyntheticEngine();
+    this.frame = makeFrame();
+    this.last = performance.now();
+    this.analysisMs = 0;
+    this.sourceLabel = "idle";
+    this.onSourceChange = null;
+
+    this.audio.onSourceChange = (label, mode) => {
+      if (mode !== "idle") this.sourceLabel = label;
+      else if (!this.synth.on) this.sourceLabel = "idle";
+      this._emit();
+    };
+  }
+
+  _emit() { if (this.onSourceChange) this.onSourceChange(this.sourceLabel); }
+
+  async mic() { await this.audio.startMic(); this.synth.stop(); }
+  async file(el) { await this.audio.startElement(el); this.synth.stop(); }
+  async osc(kind, freq) { await this.audio.startOsc(kind, freq); this.synth.stop(); }
+  demo() { this.audio.stop(); this.synth.start("demo"); this.sourceLabel = "Mode demo (sintetis)"; this._emit(); }
+  agentDrive() { this.audio.stop(); this.synth.start("agent"); this.sourceLabel = "Sinyal agen (sintetis)"; this._emit(); }
+  ttsDrive() { this.audio.stop(); this.synth.start("tts"); this.sourceLabel = "Ucapan (sintetis)"; this._emit(); }
+  stopAll() { this.audio.stop(); this.synth.stop(); this.sourceLabel = "idle"; this._emit(); }
+
+  get mode() { return this.audio.mode !== "idle" ? this.audio.mode : (this.synth.on ? "synth" : "idle"); }
+
+  /** Advance one frame. Call once per animation frame. */
+  tick(now) {
+    const f = this.frame;
+    const t0 = performance.now();
+    f.dt = clamp((now - this.last) / 1000, 1 / 240, 0.25);
+    this.last = now;
+    f.t += f.dt;
+
+    f.bands.fill(0);
+    f.peaks.fill(0);
+    f.wave.fill(0);
+    f.active = false;
+
+    this.audio.sensitivity = this.sensitivity;
+    this.audio.smoothing = this.smoothing;
+
+    const real = this.audio.read(f);
+    if (!real) this.synth.read(f);
+
+    /* decay layered event envelopes */
+    const d = (v, rate) => Math.max(0, v - f.dt * rate);
+    f.pulse = d(f.pulse, 2.6);
+    f.flashTool = d(f.flashTool, 2.2);
+    f.flashError = d(f.flashError, 1.5);
+    f.flashDone = d(f.flashDone, 1.8);
+    f.speech = d(f.speech, 3.4);
+
+    if (!real && !f.active) {
+      /* idle: gentle breathing so the stage is never dead */
+      const breath = 0.5 + 0.5 * Math.sin(f.t * 0.7);
+      for (let i = 0; i < BAND_COUNT; i++) {
+        const x = i / (BAND_COUNT - 1);
+        f.bands[i] = 0.02 * breath * Math.exp(-Math.pow((x - 0.22) / 0.4, 2));
+        f.peaks[i] = f.bands[i];
+      }
+      f.level = 0.015 * breath;
+      f.source = "idle";
+    } else {
+      f.source = this.mode === "synth" ? this.synth.kind : this.audio.mode;
+    }
+
+    /* agent + speech impulses ride on top of whatever the audio is doing */
+    f.level = clamp(f.level + f.pulse * 0.45 + f.speech * 0.3 + f.flashError * 0.3);
+    f.beat = Math.max(f.beat, f.pulse * 0.9);
+
+    this.analysisMs = this.analysisMs * 0.9 + (performance.now() - t0) * 0.1;
+    return f;
+  }
+
+  /* ---- event inputs ---- */
+  pulse(strength = 1) { this.frame.pulse = Math.max(this.frame.pulse, clamp(strength)); }
+  speechHit(strength = 0.8) { this.frame.speech = Math.max(this.frame.speech, clamp(strength)); }
+  tool() { this.frame.flashTool = 1; this.frame.pulse = Math.max(this.frame.pulse, 0.85); }
+  error() { this.frame.flashError = 1; }
+  done() { this.frame.flashDone = 1; }
+  token() { this.frame.tokens++; }
+}
+
+window.UnifierCore = { AudioEngine, SyntheticEngine, Unifier, makeFrame, BAND_COUNT, clamp, lerp };
+
+})();
+
+</script>
+<script>
+(() => {
+/* Unifier — signal sources
+   Speech recognition, speech synthesis, agent event scenarios, live WebSocket. */
+
+const { clamp, lerp } = window.UnifierCore;
+
+/* ------------------------------------------------------------------ */
+/* Speech recognition — words become "phoneme" impulses                */
+/* ------------------------------------------------------------------ */
+class SpeechSource {
+  constructor(onPhoneme, onStatus) {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    this.supported = !!SR;
+    this.rec = null;
+    this.on = false;
+    this.onPhoneme = onPhoneme;
+    this.onStatus = onStatus;
+    this.SR = SR;
+  }
+
+  start(lang = "id-ID") {
+    if (!this.supported) {
+      this.onStatus("Recognition tidak didukung browser ini. Coba Chrome atau Edge.", true);
+      return false;
+    }
+    if (this.on) { this.stop(); return false; }
+    const rec = new this.SR();
+    rec.lang = lang;
+    rec.continuous = true;
+    rec.interimResults = true;
+    rec.maxAlternatives = 1;
+
+    rec.onstart = () => { this.on = true; this.onStatus("Mendengarkan…"); };
+    rec.onerror = (e) => {
+      const msg = e.error === "not-allowed"
+        ? "Izin mikrofon ditolak untuk pengenalan ucapan."
+        : "Galat pengenalan: " + e.error;
+      this.onStatus(msg, true);
+    };
+    rec.onend = () => {
+      this.on = false;
+      if (this._want) { try { rec.start(); } catch (err) { this._want = false; this.onStatus("Berhenti."); } }
+    };
+    rec.onresult = (e) => {
+      let interim = "";
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const res = e.results[i];
+        const txt = res[0].transcript;
+        if (res.isFinal) this.onPhoneme(txt.trim(), true);
+        else interim += txt;
+      }
+      if (interim) this.onPhoneme(interim.trim(), false);
+    };
+
+    this.rec = rec;
+    this._want = true;
+    try { rec.start(); } catch (err) { this.onStatus("Tidak bisa memulai: " + err.message, true); }
+    return true;
+  }
+
+  stop() {
+    this._want = false;
+    if (this.rec) { try { this.rec.stop(); } catch (e) { /* already stopped */ } }
+    this.on = false;
+    this.onStatus("Berhenti.");
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Speech synthesis — envelope drives the synthetic engine             */
+/* ------------------------------------------------------------------ */
+class TtsSource {
+  constructor(onStatus) {
+    this.supported = "speechSynthesis" in window;
+    this.onStatus = onStatus;
+    this.speaking = false;
+  }
+
+  speak(text, lang) {
+    if (!this.supported) { this.onStatus("SpeechSynthesis tidak didukung.", true); return false; }
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang || "id-ID";
+    u.rate = 1;
+    u.pitch = 1;
+    const voices = window.speechSynthesis.getVoices();
+    const match = voices.find((v) => v.lang === u.lang) || voices.find((v) => v.lang.startsWith((u.lang || "id").slice(0, 2)));
+    if (match) u.voice = match;
+    u.onstart = () => { this.speaking = true; this.onStatus("Berbicara…"); };
+    u.onend = () => { this.speaking = false; this.onStatus("Selesai."); };
+    u.onerror = () => { this.speaking = false; this.onStatus("Ucapan gagal di perangkat ini.", true); };
+    window.speechSynthesis.speak(u);
+    return true;
+  }
+
+  stop() { if (this.supported) window.speechSynthesis.cancel(); }
+}
+
+/* ------------------------------------------------------------------ */
+/* Agent scenarios — a scripted lifecycle with visual "signatures"      */
+/* ------------------------------------------------------------------ */
+const SCENARIOS = {
+  lifecycle: [
+    { t: 0, type: "start", msg: "agen: generalist" },
+    { t: 300, type: "thinking", msg: "menafsirkan permintaan" },
+    { t: 1500, type: "tool", msg: "browser.search(\"visualisasi audio\")" },
+    { t: 2600, type: "token", msg: "Menyusun rencana" },
+    { t: 2900, type: "token", msg: " · membaca 4 sumber" },
+    { t: 3200, type: "token", msg: " · memilih palet" },
+    { t: 3800, type: "thinking", msg: "memeriksa konsistensi" },
+    { t: 4700, type: "tool", msg: "canvas.render()" },
+    { t: 5600, type: "token", msg: "Hasil siap" },
+    { t: 6200, type: "done", msg: "selesai dalam 6.2 s" },
+  ],
+  burst: [
+    { t: 0, type: "start", msg: "agen: writer" },
+    { t: 200, type: "thinking", msg: "menyiapkan draf" },
+    { t: 900, type: "token", msg: "Aliran keluaran padat" },
+    ...Array.from({ length: 46 }, (_, i) => ({ t: 1000 + i * 62, type: "token", msg: "token#" + (i + 1) })),
+    { t: 4200, type: "done", msg: "draf lengkap" },
+  ],
+  error: [
+    { t: 0, type: "start", msg: "agen: researcher" },
+    { t: 300, type: "thinking", msg: "mencoba sumber" },
+    { t: 1300, type: "tool", msg: "http.get(primary)" },
+    { t: 2100, type: "error", msg: "timeout setelah 2000 ms" },
+    { t: 2800, type: "thinking", msg: "strategi ulang" },
+    { t: 3600, type: "tool", msg: "http.get(mirror)" },
+    { t: 4600, type: "token", msg: "Pemulihan berhasil" },
+    { t: 5400, type: "done", msg: "selesai dengan 1 percobaan ulang" },
+  ],
+};
+
+class AgentSource {
+  constructor(unifier, onEvent) {
+    this.u = unifier;
+    this.onEvent = onEvent;
+    this.timer = null;
+    this.running = false;
+    this.startAt = 0;
+  }
+
+  play(name) {
+    this.stop();
+    const script = SCENARIOS[name] || SCENARIOS.lifecycle;
+    this.u.agentDrive();
+    this.running = true;
+    this.startAt = performance.now();
+    script.forEach((step) => {
+      setTimeout(() => { if (this.running) this.fire(step.type, step.msg); }, step.t);
+    });
+    this.endTimer = setTimeout(() => { this.running = false; }, script[script.length - 1].t + 900);
+  }
+
+  stop() {
+    this.running = false;
+    if (this.timer) clearTimeout(this.timer);
+    if (this.endTimer) clearTimeout(this.endTimer);
+  }
+
+  /** Translate an agent event into a visual impulse. */
+  fire(type, msg) {
+    const u = this.u;
+    switch (type) {
+      case "thinking": u.pulse(0.6); break;
+      case "tool": u.tool(); break;
+      case "token": u.token(); u.pulse(0.28); break;
+      case "speech": u.speechHit(0.9); break;
+      case "error": u.error(); break;
+      case "done": u.done(); break;
+      case "start": u.pulse(0.4); break;
+    }
+    if (this.onEvent) this.onEvent(type, msg || "");
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Live WebSocket feed                                                 */
+/* ------------------------------------------------------------------ */
+class LiveSource {
+  constructor(unifier, onEvent, onStatus) {
+    this.u = unifier;
+    this.onEvent = onEvent;
+    this.onStatus = onStatus;
+    this.ws = null;
+  }
+
+  connect(url) {
+    this.disconnect();
+    let ws;
+    try { ws = new WebSocket(url); } catch (e) { this.onStatus("URL tidak valid: " + e.message, true); return; }
+    this.ws = ws;
+    ws.onopen = () => {
+      this.onStatus("Terhubung ke " + url);
+      this.u.agentDrive();
+    };
+    ws.onmessage = (e) => {
+      let data;
+      try { data = JSON.parse(e.data); } catch (err) { data = { type: "token", text: String(e.data) }; }
+      const kind = data.type || "token";
+      const msg = data.text || data.message || data.name || "";
+      if (kind === "token") this.u.token();
+      this.u.pulse(typeof data.intensity === "number" ? data.intensity : 0.3);
+      this.onEvent(kind, msg);
+      if (kind === "tool") this.u.tool();
+      if (kind === "error") this.u.error();
+      if (kind === "done") this.u.done();
+      if (kind === "speech") this.u.speechHit(0.9);
+    };
+    ws.onerror = () => this.onStatus("Galat koneksi WebSocket.", true);
+    ws.onclose = () => { this.onStatus("Koneksi ditutup."); this.ws = null; };
+  }
+
+  disconnect() {
+    if (this.ws) { try { this.ws.close(); } catch (e) { /* already closed */ } this.ws = null; }
+  }
+
+  get connected() { return !!this.ws && this.ws.readyState === 1; }
+}
+
+window.UnifierSources = { SpeechSource, TtsSource, AgentSource, LiveSource, SCENARIOS };
+
+})();
+
+</script>
+<script>
+(() => {
+/* Unifier — visualizers
+   Six hand-written Canvas 2D renderers plus a composite "Unified" stage.
+   Every renderer receives the same feature frame, so they are interchangeable. */
+
+const { BAND_COUNT, clamp, lerp } = window.UnifierCore;
+
+/* ------------------------------------------------------------------ */
+/* Palettes + colour helpers                                           */
+/* ------------------------------------------------------------------ */
+const PALETTES = {
+  aurora: { s1: "#2dd4bf", s2: "#6366f1", s3: "#f472b6", bg: "#05080f" },
+  ember:  { s1: "#fbbf24", s2: "#f97316", s3: "#ef4444", bg: "#0d0605" },
+  ion:    { s1: "#22d3ee", s2: "#3b82f6", s3: "#a855f7", bg: "#04070f" },
+  moss:   { s1: "#a3e635", s2: "#14b8a6", s3: "#0ea5e9", bg: "#040b08" },
+  mono:   { s1: "#e2e8f0", s2: "#94a3b8", s3: "#64748b", bg: "#080a0d" },
+};
+
+function hexToRgb(hex) {
+  const h = hex.replace("#", "");
+  const n = parseInt(h.length === 3 ? h.split("").map((c) => c + c).join("") : h, 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+function mix(a, b, t) {
+  return [Math.round(lerp(a[0], b[0], t)), Math.round(lerp(a[1], b[1], t)), Math.round(lerp(a[2], b[2], t))];
+}
+
+function rgba(c, a) { return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
+
+/** Three-stop ramp across a palette, t in 0..1 */
+function ramp(pal, t) {
+  const x = clamp(t);
+  return x < 0.5 ? mix(pal.rgb1, pal.rgb2, x * 2) : mix(pal.rgb2, pal.rgb3, (x - 0.5) * 2);
+}
+
+function makePal(name) {
+  const p = PALETTES[name] || PALETTES.aurora;
+  return {
+    name: p.name,
+    bg: p.bg,
+    hex1: p.s1, hex2: p.s2, hex3: p.s3,
+    rgb1: hexToRgb(p.s1), rgb2: hexToRgb(p.s2), rgb3: hexToRgb(p.s3),
+  };
+}
+
+/* ------------------------------------------------------------------ */
+/* Base renderer                                                       */
+/* ------------------------------------------------------------------ */
+class Base {
+  constructor(env) { this.env = env; this.t = 0; }
+  /* default: paint the background with a trail fade */
+  clear(trails) {
+    const { ctx, w, h, pal } = this.env;
+    ctx.globalCompositeOperation = "source-over";
+    ctx.fillStyle = rgba(hexToRgb(pal.bg), clamp(1 - trails, 0.04, 1));
+    ctx.fillRect(0, 0, w, h);
+  }
+  bgGlow(f, strength = 0.5) {
+    const { ctx, w, h, pal } = this.env;
+    const c = ramp(pal, 0.25 + f.centroid * 0.5);
+    const g = ctx.createRadialGradient(w / 2, h * 0.55, 0, w / 2, h * 0.55, Math.max(w, h) * 0.62);
+    g.addColorStop(0, rgba(c, 0.16 * strength * (0.5 + f.level)));
+    g.addColorStop(0.55, rgba(pal.rgb2, 0.05 * strength));
+    g.addColorStop(1, rgba(pal.rgb2, 0));
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* 1. Spectrum bars                                                    */
+/* ------------------------------------------------------------------ */
+class Bars extends Base {
+  draw(f) {
+    const { ctx, w, h, pal, opts } = this.env;
+    this.clear(opts.trails);
+    this.bgGlow(f);
+
+    const n = Math.max(18, Math.round(BAND_COUNT * opts.complexity));
+    const gap = Math.max(1, w * 0.004);
+    const bw = (w - gap * (n + 1)) / n;
+    const base = opts.mirror ? h * 0.72 : h * 0.92;
+    const maxH = base * 0.9;
+
+    ctx.globalCompositeOperation = "lighter";
+
+    for (let i = 0; i < n; i++) {
+      const src = Math.min(BAND_COUNT - 1, Math.round((i / n) * BAND_COUNT));
+      const v = f.bands[src];
+      const pk = f.peaks[src];
+      const x = gap + i * (bw + gap);
+      const bh = Math.max(1.5, v * maxH * (0.6 + f.level * 0.8));
+      const col = ramp(pal, Math.pow(i / n, 0.7));
+
+      const g = ctx.createLinearGradient(0, base - bh, 0, base);
+      g.addColorStop(0, rgba(col, 0.98));
+      g.addColorStop(0.6, rgba(mix(col, pal.rgb2, 0.5), 0.85));
+      g.addColorStop(1, rgba(mix(col, pal.rgb2, 0.8), 0.35));
+      ctx.fillStyle = g;
+      roundRect(ctx, x, base - bh, bw, bh, Math.min(bw * 0.45, 5));
+      ctx.fill();
+
+      if (opts.glow && v > 0.2) {
+        ctx.shadowColor = rgba(col, 0.7);
+        ctx.shadowBlur = 14 * v;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+
+      /* peak cap */
+      const py = base - Math.max(bh, pk * maxH);
+      ctx.fillStyle = rgba(pal.rgb1, 0.95);
+      ctx.fillRect(x, py - 2, bw, 2);
+
+      /* reflection */
+      if (opts.mirror) {
+        const rh = bh * 0.34;
+        const rg = ctx.createLinearGradient(0, base, 0, base + rh);
+        rg.addColorStop(0, rgba(col, 0.34));
+        rg.addColorStop(1, rgba(col, 0));
+        ctx.fillStyle = rg;
+        ctx.fillRect(x, base, bw, rh);
+      }
+    }
+    ctx.globalCompositeOperation = "source-over";
+
+    if (opts.labels) this.labels();
+    if (f.beat > 0.05) this.beatLine(f);
+  }
+
+  labels() {
+    const { ctx, w, h, pal } = this.env;
+    const marks = [60, 120, 250, 500, 1000, 2000, 4000, 8000, 16000];
+    ctx.font = `500 ${Math.round(h * 0.022)}px ui-monospace, monospace`;
+    ctx.fillStyle = rgba(pal.rgb1, 0.55);
+    ctx.textAlign = "center";
+    const nyq = 24000;
+    marks.forEach((hz) => {
+      const t = Math.log(hz / 38) / Math.log(16000 / 38);
+      if (t < 0 || t > 1) return;
+      const x = t * w;
+      ctx.fillText(hz >= 1000 ? hz / 1000 + "k" : String(hz), x, h * 0.965);
+      ctx.fillStyle = rgba(pal.rgb1, 0.16);
+      ctx.fillRect(x, h * 0.86, 1, h * 0.06);
+      ctx.fillStyle = rgba(pal.rgb1, 0.55);
+    });
+    ctx.textAlign = "left";
+  }
+
+  beatLine(f) {
+    const { ctx, w, h, pal } = this.env;
+    ctx.fillStyle = rgba(pal.rgb3, 0.14 * f.beat);
+    ctx.fillRect(0, 0, w, h);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* 2. Waveform                                                         */
+/* ------------------------------------------------------------------ */
+class Wave extends Base {
+  draw(f) {
+    const { ctx, w, h, pal, opts } = this.env;
+    this.clear(opts.trails * 0.85);
+    this.bgGlow(f, 0.7);
+
+    const layers = Math.round(clamp(1 + opts.complexity * 2.2, 1, 5));
+    ctx.globalCompositeOperation = "lighter";
+    ctx.lineJoin = "round";
+
+    for (let l = layers - 1; l >= 0; l--) {
+      const depth = l / Math.max(1, layers - 1);
+      const amp = h * 0.3 * (1 - depth * 0.55) * (0.35 + f.level * 1.5);
+      const phase = f.t * (0.6 + depth * 0.9) * (l % 2 ? -1 : 1);
+      const col = ramp(pal, depth * 0.85);
+      const alpha = 0.9 - depth * 0.55;
+
+      ctx.beginPath();
+      const step = Math.max(1, Math.floor(f.wave.length / (w * opts.complexity)));
+      for (let x = 0; x <= w; x++) {
+        const idx = Math.min(f.wave.length - 1, Math.floor((x / w) * f.wave.length));
+        const base = f.wave[idx];
+        const wobble = Math.sin(x * 0.012 + phase) * 0.18 * (0.4 + f.centroid);
+        const y = h * 0.5 + (base + wobble) * amp * (1 - depth * 0.3);
+        if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        void step;
+      }
+      ctx.strokeStyle = rgba(col, alpha);
+      ctx.lineWidth = (2.6 - depth * 1.6) * (1 + f.level * 0.7);
+      if (opts.glow) { ctx.shadowColor = rgba(col, 0.8); ctx.shadowBlur = 18 * (1 - depth); }
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+
+    /* centre ribbon: filled area under the main wave */
+    ctx.beginPath();
+    ctx.moveTo(0, h * 0.5);
+    for (let x = 0; x <= w; x++) {
+      const idx = Math.min(f.wave.length - 1, Math.floor((x / w) * f.wave.length));
+      ctx.lineTo(x, h * 0.5 + f.wave[idx] * h * 0.42 * (0.3 + f.level * 1.4));
+    }
+    ctx.lineTo(w, h * 0.5);
+    ctx.closePath();
+    const g = ctx.createLinearGradient(0, h * 0.1, 0, h * 0.9);
+    g.addColorStop(0, rgba(pal.rgb1, 0.06 + f.level * 0.1));
+    g.addColorStop(0.5, rgba(pal.rgb2, 0.16 + f.level * 0.16));
+    g.addColorStop(1, rgba(pal.rgb1, 0.06));
+    ctx.fillStyle = g;
+    ctx.fill();
+
+    ctx.globalCompositeOperation = "source-over";
+    this.axis();
+  }
+
+  axis() {
+    const { ctx, w, h, pal } = this.env;
+    ctx.strokeStyle = rgba(pal.rgb1, 0.12);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, h * 0.5);
+    ctx.lineTo(w, h * 0.5);
+    ctx.stroke();
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* 3. Radial                                                            */
+/* ------------------------------------------------------------------ */
+class Radial extends Base {
+  draw(f) {
+    const { ctx, w, h, pal, opts } = this.env;
+    this.clear(opts.trails);
+    this.bgGlow(f, 0.9);
+
+    const cx = w / 2;
+    const cy = h / 2;
+    const r0 = Math.min(w, h) * 0.17;
+    const n = Math.round(clamp(48 * opts.complexity, 24, 128));
+    const spin = f.t * 0.18 * opts.speed;
+
+    ctx.globalCompositeOperation = "lighter";
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(spin);
+
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2;
+      const src = Math.round((i / n) * (BAND_COUNT - 1));
+      const v = f.bands[src];
+      const len = r0 * 0.35 + v * r0 * 1.5 * (0.5 + f.level);
+      const col = ramp(pal, i / n);
+      ctx.strokeStyle = rgba(col, 0.55 + v * 0.45);
+      ctx.lineWidth = Math.max(1, (Math.PI * 2 * r0) / n * 0.55);
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(a) * r0, Math.sin(a) * r0);
+      ctx.lineTo(Math.cos(a) * (r0 + len), Math.sin(a) * (r0 + len));
+      ctx.stroke();
+
+      const pk = f.peaks[src];
+      if (pk > 0.06) {
+        ctx.strokeStyle = rgba(pal.rgb1, 0.8);
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(a) * (r0 + pk * r0 * 1.5), Math.sin(a) * (r0 + pk * r0 * 1.5));
+        ctx.lineTo(Math.cos(a) * (r0 + pk * r0 * 1.5 + 4), Math.sin(a) * (r0 + pk * r0 * 1.5 + 4));
+        ctx.stroke();
+      }
+    }
+
+    /* waveform ring */
+    ctx.rotate(-spin * 1.6);
+    ctx.beginPath();
+    const steps = 240;
+    for (let i = 0; i <= steps; i++) {
+      const a = (i / steps) * Math.PI * 2;
+      const idx = Math.floor((i / steps) * f.wave.length);
+      const rr = r0 * 0.78 + f.wave[idx] * r0 * 0.5 * (0.4 + f.level);
+      const x = Math.cos(a) * rr;
+      const y = Math.sin(a) * rr;
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = rgba(pal.rgb3, 0.75);
+    ctx.lineWidth = 1.8;
+    if (opts.glow) { ctx.shadowColor = rgba(pal.rgb3, 0.8); ctx.shadowBlur = 16; }
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    /* core: breathing orb reacting to level and beat */
+    const coreR = r0 * (0.3 + f.level * 0.45 + f.beat * 0.14);
+    const cg = ctx.createRadialGradient(0, 0, 0, 0, 0, coreR * 2.6);
+    cg.addColorStop(0, rgba(pal.rgb1, 0.95));
+    cg.addColorStop(0.35, rgba(pal.rgb2, 0.5));
+    cg.addColorStop(1, rgba(pal.rgb2, 0));
+    ctx.fillStyle = cg;
+    ctx.beginPath();
+    ctx.arc(0, 0, coreR * 2.6, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+    ctx.globalCompositeOperation = "source-over";
+
+    if (f.beat > 0.05) {
+      ctx.strokeStyle = rgba(pal.rgb1, 0.35 * f.beat);
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r0 * (1.6 + (1 - f.beat) * 2.4), 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* 4. Particles                                                         */
+/* ------------------------------------------------------------------ */
+class Particles extends Base {
+  constructor(env) {
+    super(env);
+    this.ps = [];
+    this.max = 900;
+    this.emit = 0;
+    this.rings = [];
+  }
+
+  draw(f) {
+    const { ctx, w, h, pal, opts } = this.env;
+    this.clear(opts.trails * 0.92);
+    this.bgGlow(f, 0.45);
+
+    const cx = w / 2;
+    const cy = h / 2;
+    const budget = Math.round(this.max * opts.complexity);
+    const rate = f.level * 26 + f.beat * 90 + f.speech * 40;
+
+    for (let i = 0; i < rate; i++) {
+      if (this.ps.length >= budget) break;
+      const a = Math.random() * Math.PI * 2;
+      const speed = 0.6 + Math.random() * 3.4 * (0.4 + f.level + f.centroid);
+      const band = Math.floor(Math.random() * BAND_COUNT);
+      const col = ramp(pal, band / BAND_COUNT);
+      this.ps.push({
+        x: cx, y: cy,
+        vx: Math.cos(a) * speed,
+        vy: Math.sin(a) * speed,
+        life: 1,
+        decay: 0.006 + Math.random() * 0.012,
+        r: 0.7 + Math.random() * 2.6,
+        col,
+        band,
+      });
+    }
+
+    ctx.globalCompositeOperation = "lighter";
+    const turb = 0.0009 * (0.5 + f.centroid * 3);
+    for (let i = this.ps.length - 1; i >= 0; i--) {
+      const p = this.ps[i];
+      const dx = p.x - cx;
+      const dy = p.y - cy;
+      const d2 = dx * dx + dy * dy + 40;
+      /* curl-ish field: tangential drift + radial push from low bands */
+      p.vx += (-dy / d2) * 60 * turb * 60 + (dx / Math.sqrt(d2)) * f.bands[p.band] * 0.16;
+      p.vy += (dx / d2) * 60 * turb * 60 + (dy / Math.sqrt(d2)) * f.bands[p.band] * 0.16;
+      p.vx *= 0.985;
+      p.vy *= 0.985;
+      p.x += p.vx * opts.speed;
+      p.y += p.vy * opts.speed;
+      p.life -= p.decay * (0.6 + opts.speed);
+
+      if (p.life <= 0 || p.x < -40 || p.x > w + 40 || p.y < -40 || p.y > h + 40) {
+        this.ps.splice(i, 1);
+        continue;
+      }
+      const a = p.life * 0.85;
+      ctx.fillStyle = rgba(p.col, a);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r * p.life, 0, Math.PI * 2);
+      ctx.fill();
+      if (p.life > 0.75) {
+        ctx.strokeStyle = rgba(p.col, (p.life - 0.75) * 1.4);
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p.x - p.vx * 3, p.y - p.vy * 3);
+        ctx.stroke();
+      }
+    }
+
+    /* beat rings */
+    if (f.beat > 0.85) this.rings.push({ r: 0, a: 1 });
+    for (let i = this.rings.length - 1; i >= 0; i--) {
+      const rg = this.rings[i];
+      rg.r += (6 + f.level * 22) * opts.speed;
+      rg.a -= 0.022 * opts.speed;
+      if (rg.a <= 0) { this.rings.splice(i, 1); continue; }
+      ctx.strokeStyle = rgba(pal.rgb1, rg.a * 0.7);
+      ctx.lineWidth = 2.4 * rg.a;
+      ctx.beginPath();
+      ctx.arc(cx, cy, rg.r, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    /* core */
+    const cr = Math.min(w, h) * (0.03 + f.level * 0.06);
+    const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, cr * 5);
+    cg.addColorStop(0, rgba(pal.rgb1, 0.9));
+    cg.addColorStop(0.4, rgba(pal.rgb2, 0.35));
+    cg.addColorStop(1, rgba(pal.rgb2, 0));
+    ctx.fillStyle = cg;
+    ctx.beginPath();
+    ctx.arc(cx, cy, cr * 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.globalCompositeOperation = "source-over";
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* 5. Tunnel                                                            */
+/* ------------------------------------------------------------------ */
+class Tunnel extends Base {
+  constructor(env) {
+    super(env);
+    this.rings = [];
+    this.z = 0;
+    this.grid = 0;
+  }
+
+  draw(f) {
+    const { ctx, w, h, pal, opts } = this.env;
+    this.clear(opts.trails * 0.7);
+    this.bgGlow(f, 0.6);
+
+    const cx = w / 2;
+    const cy = h / 2;
+    const depth = 22;
+    const speed = (0.35 + f.level * 1.6) * opts.speed;
+    this.z += speed * f.dt * 3.2;
+    if (this.z > 1) {
+      this.z -= 1;
+      this.rings.push({ z: 1, col: ramp(pal, Math.random()), w: 1 });
+    }
+    if (f.beat > 0.8) this.rings.push({ z: 1, col: pal.rgb1, w: 2.4, bold: true });
+
+    ctx.globalCompositeOperation = "lighter";
+    ctx.lineJoin = "round";
+
+    const rings = this.rings.concat(
+      Array.from({ length: depth }, (_, i) => ({ z: (i + this.z) / depth, col: null, w: 1, ambient: true }))
+    );
+
+    for (const rg of rings) {
+      rg.z -= speed * f.dt * 0.42;
+      if (rg.z <= 0.02) continue;
+      const persp = 1 / rg.z;
+      const scale = Math.min(persp * 0.34, 14);
+      const col = rg.col || ramp(pal, 0.2 + (1 - rg.z) * 0.6);
+      const alpha = rg.ambient ? clamp((1 - rg.z) * 0.34) : clamp(rg.z * 0.7);
+      const side = Math.min(w, h) * 0.5 * scale;
+      const sides = 6;
+      const rot = f.t * 0.22 * opts.speed + rg.z * 1.4;
+      ctx.strokeStyle = rgba(col, alpha * (rg.bold ? 1.6 : 1));
+      ctx.lineWidth = clamp((rg.w * scale) / 4, 0.5, 6);
+      ctx.beginPath();
+      for (let s = 0; s <= sides; s++) {
+        const a = (s / sides) * Math.PI * 2 + rot;
+        const wob = 1 + f.bands[Math.floor(((s / sides) % 1) * (BAND_COUNT - 1))] * 0.35;
+        const x = cx + Math.cos(a) * side * wob;
+        const y = cy + Math.sin(a) * side * wob;
+        if (s === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      if (opts.glow && rg.bold) { ctx.shadowColor = rgba(col, 0.9); ctx.shadowBlur = 22; ctx.stroke(); ctx.shadowBlur = 0; }
+    }
+
+    this.rings = this.rings.filter((rg) => rg.z > 0.03);
+
+    /* vanishing core */
+    const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(w, h) * 0.16);
+    cg.addColorStop(0, rgba(pal.rgb1, 0.75));
+    cg.addColorStop(1, rgba(pal.rgb2, 0));
+    ctx.fillStyle = cg;
+    ctx.beginPath();
+    ctx.arc(cx, cy, Math.min(w, h) * 0.16, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.globalCompositeOperation = "source-over";
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* 6. Unified — every layer at once                                    */
+/* ------------------------------------------------------------------ */
+class Unified extends Base {
+  constructor(env) {
+    super(env);
+    this.ps = [];
+    this.rings = [];
+    this.mote = 0;
+  }
+
+  draw(f) {
+    const { ctx, w, h, pal, opts } = this.env;
+    this.clear(opts.trails);
+    this.bgGlow(f, 1);
+
+    const cx = w / 2;
+    const cy = h / 2;
+
+    /* ---- layer 1: drifting field motes (agent "thinking" ambience) ---- */
+    this.mote += f.dt * opts.speed;
+    ctx.globalCompositeOperation = "lighter";
+    const motes = Math.round(70 * opts.complexity);
+    for (let i = 0; i < motes; i++) {
+      const a = (i / motes) * Math.PI * 2 + this.mote * 0.12;
+      const rr = Math.min(w, h) * (0.24 + 0.3 * ((i * 37) % 100) / 100) + Math.sin(this.mote + i) * 8 * (1 + f.level * 3);
+      const x = cx + Math.cos(a) * rr * (w / Math.min(w, h)) * 0.8;
+      const y = cy + Math.sin(a) * rr;
+      const s = 0.7 + ((i * 13) % 7) / 7 * 1.6;
+      ctx.fillStyle = rgba(ramp(pal, (i % 32) / 32), 0.1 + f.level * 0.22);
+      ctx.beginPath();
+      ctx.arc(x, y, s, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    /* ---- layer 2: radial spectrum ---- */
+    const r0 = Math.min(w, h) * 0.15;
+    const n = Math.round(clamp(72 * opts.complexity, 36, 160));
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(f.t * 0.1 * opts.speed);
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2;
+      const src = Math.round((i / n) * (BAND_COUNT - 1));
+      const v = f.bands[src];
+      const len = r0 * 0.22 + v * r0 * 1.35 * (0.5 + f.level);
+      const col = ramp(pal, i / n);
+      ctx.strokeStyle = rgba(col, 0.4 + v * 0.6);
+      ctx.lineWidth = Math.max(1, (Math.PI * 2 * r0) / n * 0.5);
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(a) * r0, Math.sin(a) * r0);
+      ctx.lineTo(Math.cos(a) * (r0 + len), Math.sin(a) * (r0 + len));
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    /* ---- layer 3: waveform ribbon across the frame ---- */
+    ctx.beginPath();
+    for (let x = 0; x <= w; x += 2) {
+      const idx = Math.min(f.wave.length - 1, Math.floor((x / w) * f.wave.length));
+      const env = Math.sin((x / w) * Math.PI);
+      const y = h * 0.5 + f.wave[idx] * h * 0.2 * env * (0.5 + f.level * 1.4);
+      if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = rgba(pal.rgb3, 0.5 + f.level * 0.4);
+    ctx.lineWidth = 1.6;
+    if (opts.glow) { ctx.shadowColor = rgba(pal.rgb3, 0.7); ctx.shadowBlur = 14; }
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    /* ---- layer 4: token particles ---- */
+    const rate = f.level * 16 + f.beat * 60 + f.pulse * 70;
+    const budget = Math.round(420 * opts.complexity);
+    for (let i = 0; i < rate; i++) {
+      if (this.ps.length >= budget) break;
+      const a = Math.random() * Math.PI * 2;
+      const sp = 0.5 + Math.random() * 2.6;
+      this.ps.push({
+        x: cx, y: cy,
+        vx: Math.cos(a) * sp, vy: Math.sin(a) * sp,
+        life: 1, decay: 0.008 + Math.random() * 0.01,
+        r: 0.6 + Math.random() * 2, col: ramp(pal, Math.random()),
+      });
+    }
+    for (let i = this.ps.length - 1; i >= 0; i--) {
+      const p = this.ps[i];
+      p.x += p.vx * opts.speed;
+      p.y += p.vy * opts.speed;
+      p.vx *= 0.99;
+      p.vy *= 0.99;
+      p.life -= p.decay * opts.speed;
+      if (p.life <= 0 || p.x < -20 || p.x > w + 20 || p.y < -20 || p.y > h + 20) { this.ps.splice(i, 1); continue; }
+      ctx.fillStyle = rgba(p.col, p.life * 0.8);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r * p.life, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    /* ---- layer 5: event flashes ---- */
+    if (f.beat > 0.7) this.rings.push({ r: r0, a: 1 });
+    for (let i = this.rings.length - 1; i >= 0; i--) {
+      const rg = this.rings[i];
+      rg.r += 7 * opts.speed * (1 + f.level * 3);
+      rg.a -= 0.02 * opts.speed;
+      if (rg.a <= 0) { this.rings.splice(i, 1); continue; }
+      ctx.strokeStyle = rgba(pal.rgb1, rg.a * 0.55);
+      ctx.lineWidth = 2 * rg.a;
+      ctx.beginPath();
+      ctx.arc(cx, cy, rg.r, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    /* core orb */
+    const coreR = r0 * (0.42 + f.level * 0.5 + f.beat * 0.2);
+    const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, coreR * 3);
+    cg.addColorStop(0, rgba(pal.rgb1, 0.92));
+    cg.addColorStop(0.32, rgba(pal.rgb2, 0.42));
+    cg.addColorStop(1, rgba(pal.rgb2, 0));
+    ctx.fillStyle = cg;
+    ctx.beginPath();
+    ctx.arc(cx, cy, coreR * 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.globalCompositeOperation = "source-over";
+
+    /* tool flash: cyan sweep */
+    if (f.flashTool > 0.02) {
+      const g = ctx.createLinearGradient(0, 0, w, h);
+      g.addColorStop(0, rgba(pal.rgb1, 0));
+      g.addColorStop(clamp(1 - f.flashTool), rgba(pal.rgb1, 0.35 * f.flashTool));
+      g.addColorStop(1, rgba(pal.rgb1, 0));
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, w, h);
+    }
+
+    /* done flash: expanding halo */
+    if (f.flashDone > 0.02) {
+      ctx.strokeStyle = rgba(pal.rgb1, 0.5 * f.flashDone);
+      ctx.lineWidth = 3 * f.flashDone;
+      ctx.beginPath();
+      ctx.arc(cx, cy, Math.min(w, h) * (0.3 + (1 - f.flashDone) * 0.6), 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Shared overlays (drawn after any mode)                              */
+/* ------------------------------------------------------------------ */
+function drawGrid(env) {
+  const { ctx, w, h, pal } = env;
+  ctx.save();
+  ctx.strokeStyle = rgba(pal.rgb1, 0.08);
+  ctx.lineWidth = 1;
+  const step = w / 16;
+  ctx.beginPath();
+  for (let x = step; x < w; x += step) { ctx.moveTo(x, 0); ctx.lineTo(x, h); }
+  for (let y = step; y < h; y += step) { ctx.moveTo(0, y); ctx.lineTo(w, y); }
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawErrorFlash(env, f) {
+  if (f.flashError < 0.02) return;
+  const { ctx, w, h } = env;
+  const g = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.2, w / 2, h / 2, Math.max(w, h) * 0.72);
+  g.addColorStop(0, `rgba(255,60,60,0)`);
+  g.addColorStop(1, `rgba(255,60,60,${0.42 * f.flashError})`);
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, w, h);
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  const rr = Math.min(r, Math.abs(w) / 2, Math.abs(h) / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + rr, y);
+  ctx.arcTo(x + w, y, x + w, y + h, rr);
+  ctx.arcTo(x + w, y + h, x, y + h, rr);
+  ctx.arcTo(x, y + h, x, y, rr);
+  ctx.arcTo(x, y, x + w, y, rr);
+  ctx.closePath();
+}
+
+const MODES = {
+  bars: Bars,
+  wave: Wave,
+  radial: Radial,
+  particles: Particles,
+  tunnel: Tunnel,
+  unified: Unified,
+};
+
+window.UnifierViz = { MODES, PALETTES, makePal, ramp, rgba, drawGrid, drawErrorFlash, hexToRgb };
+
+})();
+
+</script>
+<script>
+/* Unifier — application shell
+   Wires sources -> engine -> renderers, and drives the UI, HUD, recorder, URL state. */
+
+(() => {
+  const { Unifier, clamp } = window.UnifierCore;
+  const { SpeechSource, TtsSource, AgentSource, LiveSource } = window.UnifierSources;
+  const { MODES, PALETTES, makePal, drawGrid, drawErrorFlash, ramp, rgba, hexToRgb } = window.UnifierViz;
+
+  const $ = (id) => document.getElementById(id);
+  const root = document.documentElement;
+
+  /* ------------------------------------------------------------------ */
+  /* State                                                               */
+  /* ------------------------------------------------------------------ */
+  const state = {
+    mode: "bars",
+    palette: "aurora",
+    sensitivity: 1,
+    smoothing: 0.82,
+    complexity: 1,
+    speed: 1,
+    trails: 0.88,
+    grid: true,
+    glow: true,
+    mirror: true,
+    labels: false,
+    reduceMotion: true,
+    theme: "dark",
+  };
+
+  const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ------------------------------------------------------------------ */
+  /* URL state — every control is shareable                             */
+  /* ------------------------------------------------------------------ */
+  const URL_KEYS = ["mode", "palette", "sensitivity", "smoothing", "complexity", "speed", "trails", "grid", "glow", "mirror", "labels", "theme"];
+
+  function readUrl() {
+    const q = new URLSearchParams(location.search);
+    URL_KEYS.forEach((k) => {
+      if (!q.has(k)) return;
+      const raw = q.get(k);
+      const cur = state[k];
+      if (typeof cur === "number") {
+        const n = parseFloat(raw);
+        if (!Number.isNaN(n)) state[k] = n;
+      } else if (typeof cur === "boolean") {
+        state[k] = raw !== "0" && raw !== "false";
+      } else if (k === "mode" && MODES[raw]) {
+        state.mode = raw;
+      } else if (k === "palette" && PALETTES[raw]) {
+        state.palette = raw;
+      } else if (k === "theme" && (raw === "dark" || raw === "light")) {
+        state.theme = raw;
+      }
+    });
+  }
+
+  function writeUrl() {
+    const q = new URLSearchParams();
+    URL_KEYS.forEach((k) => {
+      const v = state[k];
+      q.set(k, typeof v === "boolean" ? (v ? "1" : "0") : String(v));
+    });
+    history.replaceState(null, "", location.pathname + "?" + q.toString());
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Canvas + environment                                                */
+  /* ------------------------------------------------------------------ */
+  const canvas = $("stage-canvas");
+  const ctx = canvas.getContext("2d", { alpha: false });
+  const wrap = $("stage-wrap");
+
+  const env = {
+    ctx, canvas, w: 0, h: 0, dpr: 1,
+    pal: makePal(state.palette),
+    opts: state,
+    reduceMotion: prefersReduced && state.reduceMotion,
+  };
+
+  function resize() {
+    const rect = wrap.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = Math.max(320, Math.round(rect.width));
+    const h = Math.max(180, Math.round(rect.height));
+    if (env.w === w && env.h === h && env.dpr === dpr) return;
+    env.w = w; env.h = h; env.dpr = dpr;
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = env.pal.bg;
+    ctx.fillRect(0, 0, w, h);
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Engine + sources                                                    */
+  /* ------------------------------------------------------------------ */
+  const unifier = new Unifier();
+  const speech = new SpeechSource(onPhoneme, onSpeechStatus);
+  const tts = new TtsSource(onSpeechStatus);
+  const agent = new AgentSource(unifier, onAgentEvent);
+  const live = new LiveSource(unifier, onAgentEvent, onLiveStatus);
+
+  let renderer = new MODES[state.mode](env);
+
+  function setMode(name, announce) {
+    if (!MODES[name]) return;
+    state.mode = name;
+    renderer = new MODES[name](env);
+    [...$("mode-picker").children].forEach((b) => {
+      const on = b.dataset.mode === name;
+      b.classList.toggle("is-active", on);
+      b.setAttribute("aria-checked", on ? "true" : "false");
+    });
+    $("hud-mode").textContent = name.toUpperCase();
+    if (announce) toast("Modus: " + name);
+    writeUrl();
+  }
+
+  function setPalette(name) {
+    if (!PALETTES[name]) return;
+    state.palette = name;
+    env.pal = makePal(name);
+    const p = PALETTES[name];
+    root.style.setProperty("--s1", p.s1);
+    root.style.setProperty("--s2", p.s2);
+    root.style.setProperty("--s3", p.s3);
+    [...$("palette-picker").children].forEach((b) => {
+      const on = b.dataset.palette === name;
+      b.classList.toggle("is-active", on);
+      b.setAttribute("aria-checked", on ? "true" : "false");
+    });
+    ctx.fillStyle = env.pal.bg;
+    ctx.fillRect(0, 0, env.w, env.h);
+    writeUrl();
+  }
+
+  function setTheme(name) {
+    state.theme = name;
+    root.setAttribute("data-theme", name);
+    $("btn-theme").setAttribute("aria-label", name === "dark" ? "Ganti ke tema terang" : "Ganti ke tema gelap");
+    writeUrl();
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Main loop                                                           */
+  /* ------------------------------------------------------------------ */
+  let running = true;
+  let fps = 60;
+  let frames = 0;
+  let fpsClock = performance.now();
+  let lastUi = 0;
+
+  function loop(now) {
+    if (!running) return;
+    requestAnimationFrame(loop);
+
+    resize();
+    const f = unifier.tick(now);
+    env.reduceMotion = prefersReduced && state.reduceMotion;
+
+    const speedScale = env.reduceMotion ? 0.35 : 1;
+    const savedSpeed = state.speed;
+    if (env.reduceMotion) state.speed = Math.min(state.speed, 0.6);
+
+    renderer.draw(f);
+
+    if (state.grid) drawGrid(env);
+    drawErrorFlash(env, f);
+
+    state.speed = savedSpeed;
+
+    /* HUD + stats, throttled to ~6 Hz so text never costs a frame */
+    frames++;
+    if (now - fpsClock >= 500) {
+      fps = Math.round((frames * 1000) / (now - fpsClock));
+      frames = 0;
+      fpsClock = now;
+    }
+    if (now - lastUi > 160) {
+      lastUi = now;
+      updateUi(f, speedScale);
+    }
+  }
+
+  function updateUi(f, speedScale) {
+    $("stat-fps").textContent = fps;
+    $("stat-latency").textContent = unifier.audio.mode === "idle" ? "—" : unifier.audio.latencyMs;
+    $("meter-label").textContent = f.active ? (f.db <= -60 ? "-60 dB" : f.db.toFixed(1) + " dB") : "-∞ dB";
+    $("engine-label").textContent = env.reduceMotion && prefersReduced
+      ? "reduced-motion " + speedScale.toFixed(2) + "×"
+      : state.mode + " · " + (f.bpm ? f.bpm + " bpm" : "—");
+
+    /* peak frequency */
+    let bi = 0;
+    for (let i = 1; i < f.bands.length; i++) if (f.bands[i] > f.bands[bi]) bi = i;
+    const nyq = unifier.audio.ctx ? unifier.audio.ctx.sampleRate / 2 : 24000;
+    const hz = 38 * Math.pow(16000 / 38, (bi + 0.5) / f.bands.length);
+    $("stat-peak").textContent = f.active && hz > 40 ? (hz >= 1000 ? (hz / 1000).toFixed(1) + "k" : Math.round(hz)) : "—";
+    void nyq;
+
+    wrap.setAttribute("data-active", f.active ? "true" : "false");
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Overlay / activation                                                */
+  /* ------------------------------------------------------------------ */
+  function activate() {
+    const ov = $("stage-overlay");
+    if (ov && !ov.hidden) ov.hidden = true;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Toast                                                               */
+  /* ------------------------------------------------------------------ */
+  let toastTimer = null;
+  function toast(msg) {
+    const el = $("toast");
+    el.textContent = msg;
+    el.classList.add("is-show");
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove("is-show"), 2600);
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Source status + event log                                           */
+  /* ------------------------------------------------------------------ */
+  function setNowPlaying(label) {
+    $("now-playing").textContent = label || "Menunggu sumber sinyal…";
+  }
+
+  unifier.onSourceChange = (label) => {
+    setNowPlaying(label);
+    if (label) activate();
+  };
+
+  function onSpeechStatus(msg, isError) {
+    const n = $("speech-note");
+    n.textContent = msg;
+    n.classList.toggle("is-error", !!isError);
+    $("btn-speech").classList.toggle("is-on", speech.on);
+  }
+
+  function onLiveStatus(msg, isError) {
+    toast(msg);
+    $("btn-ws").classList.toggle("is-on", live.connected);
+    if (isError) $("btn-ws").classList.remove("is-on");
+  }
+
+  const KIND_LABEL = {
+    start: "mulai", thinking: "pikir", tool: "alat", token: "token",
+    error: "galat", done: "selesai", speech: "ucapan",
+  };
+
+  function onAgentEvent(kind, msg) {
+    const log = $("event-log");
+    const row = document.createElement("div");
+    row.className = "event-log__row";
+    row.dataset.kind = kind;
+    const t = new Date();
+    const ts = String(t.getMinutes()).padStart(2, "0") + ":" + String(t.getSeconds()).padStart(2, "0") + "." + String(t.getMilliseconds()).padStart(3, "0");
+    row.innerHTML = `<span class="event-log__time">${ts}</span>` +
+      `<span class="event-log__kind">${KIND_LABEL[kind] || kind}</span>` +
+      `<span class="event-log__msg"></span>`;
+    row.querySelector(".event-log__msg").textContent = msg || "—";
+    log.prepend(row);
+    while (log.children.length > 14) log.lastChild.remove();
+    activate();
+  }
+
+  let lastFinalText = "";
+  function onPhoneme(text, isFinal) {
+    const out = $("transcript");
+    if (isFinal) lastFinalText = (lastFinalText + " " + text).trim();
+    out.textContent = isFinal ? lastFinalText : lastFinalText + " " + text;
+    out.classList.toggle("is-live", !isFinal);
+    unifier.speechHit(isFinal ? 1 : 0.55);
+    drawPhonemeStrip(text);
+    activate();
+  }
+
+  function drawPhonemeStrip(text) {
+    const strip = $("phoneme-strip");
+    const words = (text || "").split(/\s+/).filter(Boolean);
+    words.slice(-14).forEach((w) => {
+      const i = document.createElement("i");
+      const h = 6 + Math.min(26, w.length * 4);
+      i.style.height = h + "px";
+      i.title = w;
+      strip.appendChild(i);
+    });
+    while (strip.children.length > 28) strip.firstChild.remove();
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Controls: mode + palette                                            */
+  /* ------------------------------------------------------------------ */
+  $("mode-picker").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-mode]");
+    if (b) setMode(b.dataset.mode, true);
+  });
+
+  $("palette-picker").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-palette]");
+    if (b) setPalette(b.dataset.palette);
+  });
+
+  /* ------------------------------------------------------------------ */
+  /* Controls: sliders + toggles                                         */
+  /* ------------------------------------------------------------------ */
+  const sliders = [
+    ["ctl-sensitivity", "sensitivity", "val-sensitivity", (v) => v.toFixed(2) + "×"],
+    ["ctl-smoothing", "smoothing", "val-smoothing", (v) => v.toFixed(2)],
+    ["ctl-complexity", "complexity", "val-complexity", (v) => v.toFixed(2) + "×"],
+    ["ctl-speed", "speed", "val-speed", (v) => v.toFixed(2) + "×"],
+    ["ctl-trails", "trails", "val-trails", (v) => v.toFixed(2)],
+  ];
+  sliders.forEach(([id, key, outId, fmt]) => {
+    const el = $(id);
+    const out = $(outId);
+    el.value = state[key];
+    out.textContent = fmt(state[key]);
+    el.addEventListener("input", () => {
+      state[key] = parseFloat(el.value);
+      out.textContent = fmt(state[key]);
+      writeUrl();
+    });
+  });
+
+  const toggles = [
+    ["tgl-grid", "grid"], ["tgl-glow", "glow"], ["tgl-mirror", "mirror"],
+    ["tgl-labels", "labels"], ["tgl-reduce", "reduceMotion"],
+  ];
+  toggles.forEach(([id, key]) => {
+    const el = $(id);
+    el.checked = state[key];
+    el.addEventListener("change", () => { state[key] = el.checked; writeUrl(); });
+  });
+
+  /* ------------------------------------------------------------------ */
+  /* Controls: theme + share + fullscreen                                */
+  /* ------------------------------------------------------------------ */
+  $("btn-theme").addEventListener("click", () => setTheme(state.theme === "dark" ? "light" : "dark"));
+
+  $("btn-share").addEventListener("click", async () => {
+    writeUrl();
+    const url = location.href;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast("Tautan preset disalin");
+    } catch (e) {
+      history.replaceState(null, "", url);
+      toast("Tautan ada di address bar");
+    }
+  });
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) wrap.requestFullscreen?.().catch(() => toast("Layar penuh tidak tersedia"));
+    else document.exitFullscreen?.();
+  }
+  $("btn-full").addEventListener("click", toggleFullscreen);
+
+  /* ------------------------------------------------------------------ */
+  /* Controls: audio sources                                             */
+  /* ------------------------------------------------------------------ */
+  async function startMic() {
+    try {
+      await unifier.mic();
+      $("btn-mic").classList.add("is-on");
+      $("btn-mic").textContent = "Mikrofon aktif";
+      $("mic-note").classList.remove("is-error");
+      $("mic-note").textContent = "Input langsung aktif. Bicara, tepuk tangan, atau putar musik.";
+      toast("Mikrofon aktif");
+    } catch (e) {
+      const msg = e.name === "NotAllowedError"
+        ? "Izin mikrofon ditolak. Buka lewat http/https, bukan file://."
+        : "Gagal membuka mikrofon: " + e.message;
+      $("mic-note").textContent = msg;
+      $("mic-note").classList.add("is-error");
+      toast("Mikrofon gagal");
+    }
+  }
+
+  $("btn-mic").addEventListener("click", startMic);
+
+  const audioEl = $("audio-el");
+  const fileInput = $("file-input");
+  const dropzone = $("dropzone");
+
+  async function loadFile(file) {
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    audioEl.src = url;
+    setNowPlaying("Berkas: " + file.name);
+    try {
+      await unifier.file(audioEl);
+      await audioEl.play();
+      toast("Memutar " + file.name);
+    } catch (e) {
+      toast("Gagal memutar berkas");
+    }
+  }
+
+  fileInput.addEventListener("change", () => loadFile(fileInput.files[0]));
+  ["dragenter", "dragover"].forEach((ev) => dropzone.addEventListener(ev, (e) => { e.preventDefault(); dropzone.classList.add("is-over"); }));
+  ["dragleave", "drop"].forEach((ev) => dropzone.addEventListener(ev, (e) => { e.preventDefault(); dropzone.classList.remove("is-over"); }));
+  dropzone.addEventListener("drop", (e) => loadFile(e.dataTransfer.files[0]));
+
+  let oscOn = false;
+  $("osc-freq").addEventListener("input", () => { $("val-osc-freq").textContent = $("osc-freq").value + " Hz"; });
+  $("btn-osc").addEventListener("click", async () => {
+    if (oscOn) { unifier.stopAll(); oscOn = false; $("btn-osc").textContent = "Jalankan generator"; $("btn-osc").classList.remove("is-on"); return; }
+    try {
+      await unifier.osc($("osc-type").value, parseFloat($("osc-freq").value));
+      oscOn = true;
+      $("btn-osc").textContent = "Hentikan generator";
+      $("btn-osc").classList.add("is-on");
+    } catch (e) { toast("Generator gagal: " + e.message); }
+  });
+
+  /* ------------------------------------------------------------------ */
+  /* Controls: speech                                                    */
+  /* ------------------------------------------------------------------ */
+  $("btn-speech").addEventListener("click", () => {
+    if (speech.on) speech.stop(); else speech.start("id-ID");
+  });
+
+  $("btn-tts").addEventListener("click", () => {
+    const text = $("tts-text").value.trim();
+    if (!text) { toast("Tulis teks dulu"); return; }
+    unifier.ttsDrive();
+    const ok = tts.speak(text, $("tts-lang").value);
+    if (ok) { toast("Mengucapkan teks"); drawPhonemeStrip(text); }
+  });
+
+  /* ------------------------------------------------------------------ */
+  /* Controls: agent scenarios + live feed                               */
+  /* ------------------------------------------------------------------ */
+  $("scenario-list").addEventListener("click", (e) => {
+    const b = e.target.closest(".scenario");
+    if (!b) return;
+    [...$("scenario-list").children].forEach((x) => x.classList.toggle("is-active", x === b));
+    agent.play(b.dataset.scenario);
+    $("btn-scenario").classList.add("is-on");
+    activate();
+  });
+
+  $("btn-scenario").addEventListener("click", () => {
+    const active = $("scenario-list").querySelector(".scenario.is-active");
+    agent.play(active ? active.dataset.scenario : "lifecycle");
+    $("btn-scenario").classList.add("is-on");
+    activate();
+  });
+
+  $("btn-scenario-stop").addEventListener("click", () => {
+    agent.stop();
+    $("btn-scenario").classList.remove("is-on");
+    if (!live.connected) unifier.stopAll();
+  });
+
+  $("btn-ws").addEventListener("click", () => {
+    if (live.connected) { live.disconnect(); $("btn-ws").textContent = "Sambung"; $("btn-ws").classList.remove("is-on"); return; }
+    const url = $("ws-url").value.trim();
+    if (!url) { toast("Masukkan URL WebSocket"); return; }
+    live.connect(url);
+    $("btn-ws").textContent = "Putuskan";
+  });
+
+  /* ------------------------------------------------------------------ */
+  /* Recorder — WebM straight from the canvas                            */
+  /* ------------------------------------------------------------------ */
+  let recorder = null;
+  let chunks = [];
+  const btnRec = $("btn-rec");
+
+  function toggleRecord() {
+    if (recorder && recorder.state === "recording") {
+      recorder.stop();
+      return;
+    }
+    if (typeof MediaRecorder === "undefined" || !canvas.captureStream) {
+      toast("Perekaman tidak didukung browser ini");
+      return;
+    }
+    const stream = canvas.captureStream(60);
+    const types = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm"];
+    const mime = types.find((t) => MediaRecorder.isTypeSupported(t)) || "";
+    try {
+      recorder = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: 8_000_000 } : undefined);
+    } catch (e) { toast("Perekaman gagal dimulai"); return; }
+    chunks = [];
+    recorder.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+    recorder.onstop = () => {
+      const blob = new Blob(chunks, { type: mime || "video/webm" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "unifier-" + state.mode + "-" + Date.now() + ".webm";
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      btnRec.classList.remove("is-rec");
+      btnRec.textContent = "Rekam";
+      toast("Rekaman diunduh (" + (blob.size / 1e6).toFixed(1) + " MB)");
+    };
+    recorder.start(1000);
+    btnRec.classList.add("is-rec");
+    btnRec.textContent = "Berhenti";
+    toast("Merekam panggung…");
+  }
+  btnRec.addEventListener("click", toggleRecord);
+
+  /* ------------------------------------------------------------------ */
+  /* Demo mode + keyboard                                                */
+  /* ------------------------------------------------------------------ */
+  function startDemo() {
+    unifier.demo();
+    $("btn-demo").classList.add("is-on");
+    activate();
+    toast("Mode demo: sinyal sintetis");
+  }
+  $("btn-demo").addEventListener("click", startDemo);
+  $("btn-start").addEventListener("click", startMic);
+
+  const MODE_ORDER = ["bars", "wave", "radial", "particles", "tunnel", "unified"];
+
+  document.addEventListener("keydown", (e) => {
+    if (e.target.matches("input, textarea, select")) return;
+    const k = e.key.toLowerCase();
+    if (k >= "1" && k <= "6") setMode(MODE_ORDER[parseInt(k, 10) - 1], true);
+    else if (k === "m") startMic();
+    else if (k === "d") startDemo();
+    else if (k === "f") toggleFullscreen();
+    else if (k === "r") toggleRecord();
+    else if (k === "t") setTheme(state.theme === "dark" ? "light" : "dark");
+    else if (k === " ") { e.preventDefault(); setMode(MODE_ORDER[(MODE_ORDER.indexOf(state.mode) + 1) % MODE_ORDER.length], true); }
+  });
+
+  /* ------------------------------------------------------------------ */
+  /* Tabs                                                                */
+  /* ------------------------------------------------------------------ */
+  const tabs = [...document.querySelectorAll('.tabs [role="tab"]')];
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      tabs.forEach((t) => {
+        const on = t === tab;
+        t.classList.toggle("is-active", on);
+        t.setAttribute("aria-selected", on ? "true" : "false");
+        $(t.getAttribute("aria-controls")).classList.toggle("is-active", on);
+      });
+    });
+    tab.addEventListener("keydown", (e) => {
+      const i = tabs.indexOf(tab);
+      let n = -1;
+      if (e.key === "ArrowRight") n = (i + 1) % tabs.length;
+      if (e.key === "ArrowLeft") n = (i - 1 + tabs.length) % tabs.length;
+      if (n >= 0) { e.preventDefault(); tabs[n].focus(); tabs[n].click(); }
+    });
+  });
+
+  /* ------------------------------------------------------------------ */
+  /* Boot                                                                */
+  /* ------------------------------------------------------------------ */
+  readUrl();
+  setTheme(state.theme);
+  setPalette(state.palette);
+  setMode(state.mode, false);
+  resize();
+
+  if (prefersReduced && state.reduceMotion) {
+    $("engine-label").textContent = "reduced-motion";
+  }
+
+  window.addEventListener("resize", resize);
+  if ("ResizeObserver" in window) new ResizeObserver(resize).observe(wrap);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) { running = false; }
+    else if (!running) { running = true; unifier.last = performance.now(); requestAnimationFrame(loop); }
+  });
+
+  requestAnimationFrame(loop);
+  window.__unifier = { state, unifier, env, setMode, setPalette, setTheme, toast, live, agent, speech, tts };
+})();
+
+</script>
+</body>
+</html>

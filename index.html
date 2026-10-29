@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Unifier — Visualisasi Suara Real-time</title>
+<meta name="description" content="Eksperimen Unifier: sistem visualisasi suara buatan sendiri yang mengubah audio, ucapan, dan sinyal agen AI menjadi efek visual real-time di browser.">
+<meta name="theme-color" content="#070b14">
+<meta name="color-scheme" content="dark light">
+<link rel="canonical" href="https://antono4.github.io/VisualisasiSuaraReal-timeUnifier/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Unifier — Visualisasi Suara Real-time">
+<meta property="og:description" content="Mengubah audio, ucapan, dan sinyal agen AI menjadi efek visual. Mesin visualisasi buatan sendiri, tanpa library.">
+<meta property="og:url" content="https://antono4.github.io/VisualisasiSuaraReal-timeUnifier/">
+<meta property="og:image" content="https://antono4.github.io/VisualisasiSuaraReal-timeUnifier/assets/social-card.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Unifier — Visualisasi Suara Real-time">
+<meta name="twitter:description" content="Audio, ucapan, dan sinyal agen AI menjadi efek visual real-time.">
+<meta name="twitter:image" content="https://antono4.github.io/VisualisasiSuaraReal-timeUnifier/assets/social-card.png">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<a class="skip-link" href="#stage">Lompat ke panggung visual</a>
+
+<header class="topbar">
+  <div class="topbar__brand">
+    <span class="logo" aria-hidden="true">
+      <i></i><i></i><i></i><i></i><i></i>
+    </span>
+    <div class="wordmark">
+      <span class="wordmark__a">Uni</span><span class="wordmark__b">fier</span>
+    </div>
+    <span class="pill">eksperimen v1</span>
+  </div>
+
+  <nav class="topbar__nav" aria-label="Bagian halaman">
+    <a href="#stage">Panggung</a>
+    <a href="#kontrol">Kontrol</a>
+    <a href="#sumber">Sumber</a>
+    <a href="#catatan">Catatan</a>
+  </nav>
+
+  <div class="topbar__actions">
+    <button id="btn-share" class="btn btn--ghost" type="button" title="Salin tautan preset saat ini">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M12 3v12M8 7l4-4 4 4"/></svg>
+      <span class="btn__label">Bagikan</span>
+    </button>
+    <button id="btn-theme" class="btn btn--icon" type="button" aria-label="Ganti tema terang/gelap">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+  <!-- ============================= HERO / STAGE ============================= -->
+  <section class="hero" id="stage">
+    <div class="hero__copy">
+      <p class="eyebrow"><span class="dot"></span> Unifier · real-time audio → visual</p>
+      <h1>Suara menjadi <em>bentuk</em>,<br>sinyal menjadi <em>gerak</em>.</h1>
+      <p class="lede">
+        Ini eksperimen <strong>Unifier</strong>: mesin visualisasi buatan sendiri yang membaca
+        audio, ucapan, dan sinyal agen AI — lalu mengubahnya menjadi efek visual yang
+        bergerak pada 60&nbsp;fps di browser. Tanpa library visual, tanpa WebGL.
+      </p>
+      <div class="hero__actions">
+        <button id="btn-start" class="btn btn--primary" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
+          Mulai mikrofon
+        </button>
+        <button id="btn-demo" class="btn btn--outline" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg>
+          Coba tanpa mikrofon
+        </button>
+        <button id="btn-rec" class="btn btn--outline" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6"/></svg>
+          Rekam
+        </button>
+        <button id="btn-full" class="btn btn--icon" type="button" aria-label="Mode layar penuh">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V5a1 1 0 0 1 1-1h4M20 9V5a1 1 0 0 0-1-1h-4M4 15v4a1 1 0 0 0 1 1h4M20 15v4a1 1 0 0 1-1 1h-4"/></svg>
+        </button>
+      </div>
+      <ul class="stat-row" id="stat-row">
+        <li><b id="stat-fps">—</b><span>fps</span></li>
+        <li><b id="stat-modes">6</b><span>modus visual</span></li>
+        <li><b id="stat-latency">—</b><span>ms latensi</span></li>
+        <li><b id="stat-peak">—</b><span>Hz puncak</span></li>
+      </ul>
+    </div>
+
+    <div class="hero__viz">
+      <div class="stage-wrap" id="stage-wrap">
+        <canvas id="stage-canvas" width="1280" height="720" aria-label="Kanvas visualisasi suara"></canvas>
+        <div class="stage-glow" aria-hidden="true"></div>
+        <div class="hud" id="hud" aria-hidden="true">
+          <span class="hud__tick tl"></span><span class="hud__tick tr"></span>
+          <span class="hud__tick bl"></span><span class="hud__tick br"></span>
+          <span class="hud__line"></span>
+          <span class="hud__tag">unifier · live</span>
+          <span class="hud__mode" id="hud-mode">BARS</span>
+          <span class="hud__scale"><i>20 Hz</i><i>1 kHz</i><i>16 kHz</i></span>
+        </div>
+        <div class="stage-overlay" id="stage-overlay">
+          <div class="stage-overlay__inner">
+            <span class="logo logo--lg" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+            <p class="stage-overlay__title">Panggung visual siap</p>
+            <p class="stage-overlay__hint">Tekan <kbd>M</kbd> untuk mikrofon, <kbd>D</kbd> untuk mode demo.</p>
+          </div>
+        </div>
+      </div>
+      <div class="stage-bar">
+        <div class="now-playing">
+          <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+          <span id="now-playing">Menunggu sumber sinyal…</span>
+        </div>
+        <div class="stage-bar__right">
+          <span class="mono" id="meter-label">-∞ dB</span>
+          <span class="mono dim" id="engine-label">idle</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= KONTROL ============================= -->
+  <section class="panel" id="kontrol">
+    <header class="panel__head">
+      <h2>Kontrol visual</h2>
+      <p>Semua perubahan langsung terlihat di panggung. Setiap kontrol bisa dibagikan lewat tautan.</p>
+    </header>
+
+    <div class="controls">
+      <div class="control-group">
+        <span class="control-group__label">Modus</span>
+        <div class="segmented" id="mode-picker" role="radiogroup" aria-label="Modus visualisasi">
+          <button type="button" role="radio" data-mode="bars" aria-checked="true" class="is-active">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M9 20V4M14 20v-9M19 20V7"/></svg> Spektrum
+          </button>
+          <button type="button" role="radio" data-mode="wave" aria-checked="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12c3-8 5-8 8 0s5 8 8 0"/></svg> Gelombang
+          </button>
+          <button type="button" role="radio" data-mode="radial" aria-checked="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v6M12 15v6M3 12h6M15 12h6"/></svg> Radial
+          </button>
+          <button type="button" role="radio" data-mode="particles" aria-checked="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h.01M18 8h.01M10 18h.01M16 16h.01M12 10h.01"/></svg> Partikel
+          </button>
+          <button type="button" role="radio" data-mode="tunnel" aria-checked="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v12H4zM8 9.5h8v5H8z"/></svg> Terowongan
+          </button>
+          <button type="button" role="radio" data-mode="unified" aria-checked="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 6-9 6-9-6zM3 15l9 6 9-6"/></svg> Unified
+          </button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <span class="control-group__label">Palet</span>
+        <div class="swatches" id="palette-picker" role="radiogroup" aria-label="Palet warna">
+          <button type="button" role="radio" data-palette="aurora" aria-checked="true" class="is-active" style="--s1:#2dd4bf;--s2:#6366f1;--s3:#f472b6"></button>
+          <button type="button" role="radio" data-palette="ember" aria-checked="false" style="--s1:#fbbf24;--s2:#f97316;--s3:#ef4444"></button>
+          <button type="button" role="radio" data-palette="ion" aria-checked="false" style="--s1:#22d3ee;--s2:#3b82f6;--s3:#a855f7"></button>
+          <button type="button" role="radio" data-palette="moss" aria-checked="false" style="--s1:#a3e635;--s2:#14b8a6;--s3:#0ea5e9"></button>
+          <button type="button" role="radio" data-palette="mono" aria-checked="false" style="--s1:#e2e8f0;--s2:#94a3b8;--s3:#475569"></button>
+        </div>
+      </div>
+
+      <div class="control-group control-group--wide">
+        <label class="slider" for="ctl-sensitivity">
+          <span class="slider__name">Sensitivitas <b id="val-sensitivity">1.0×</b></span>
+          <input id="ctl-sensitivity" type="range" min="0.3" max="3" step="0.05" value="1">
+        </label>
+        <label class="slider" for="ctl-smoothing">
+          <span class="slider__name">Kehalusan <b id="val-smoothing">0.82</b></span>
+          <input id="ctl-smoothing" type="range" min="0" max="0.96" step="0.01" value="0.82">
+        </label>
+        <label class="slider" for="ctl-complexity">
+          <span class="slider__name">Kompleksitas <b id="val-complexity">1.0×</b></span>
+          <input id="ctl-complexity" type="range" min="0.35" max="2" step="0.05" value="1">
+        </label>
+        <label class="slider" for="ctl-speed">
+          <span class="slider__name">Kecepatan <b id="val-speed">1.0×</b></span>
+          <input id="ctl-speed" type="range" min="0.2" max="3" step="0.05" value="1">
+        </label>
+        <label class="slider" for="ctl-trails">
+          <span class="slider__name">Jejak <b id="val-trails">0.88</b></span>
+          <input id="ctl-trails" type="range" min="0" max="0.99" step="0.01" value="0.88">
+        </label>
+      </div>
+
+      <div class="control-group control-group--wide toggles">
+        <label class="toggle"><input type="checkbox" id="tgl-grid" checked><span>Kisi latar</span></label>
+        <label class="toggle"><input type="checkbox" id="tgl-glow" checked><span>Glow</span></label>
+        <label class="toggle"><input type="checkbox" id="tgl-mirror" checked><span>Cermin bawah</span></label>
+        <label class="toggle"><input type="checkbox" id="tgl-labels"><span>Label frekuensi</span></label>
+        <label class="toggle"><input type="checkbox" id="tgl-reduce" checked><span>Hormati <span class="mono">prefers-reduced-motion</span></span></label>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= SUMBER ============================= -->
+  <section class="panel" id="sumber">
+    <header class="panel__head">
+      <h2>Sumber sinyal</h2>
+      <p>Tiga masukan berbeda, satu mesin analisis. Ini inti ide “Unifier”.</p>
+    </header>
+
+    <div class="tabs" role="tablist" aria-label="Sumber sinyal">
+      <button role="tab" id="tab-audio" aria-controls="src-audio" aria-selected="true" class="is-active">Audio</button>
+      <button role="tab" id="tab-speech" aria-controls="src-speech" aria-selected="false">Ucapan</button>
+      <button role="tab" id="tab-agent" aria-controls="src-agent" aria-selected="false">Sinyal Agen</button>
+    </div>
+
+    <div class="tabpanels">
+      <div class="tabpanel is-active" role="tabpanel" id="src-audio" aria-labelledby="tab-audio">
+        <div class="src-grid">
+          <article class="src-card">
+            <h3><span class="src-card__ico">🎙️</span> Mikrofon perangkat</h3>
+            <p>Input langsung dari perangkat. Paling cocok untuk menguji tepukan, tepuk tangan, atau musik dari speaker.</p>
+            <button id="btn-mic" class="btn btn--primary btn--block" type="button">Nyalakan mikrofon</button>
+            <p class="src-note" id="mic-note">Butuh izin mikrofon. Di <span class="mono">file://</span> browser akan menolak — pakai server lokal.</p>
+          </article>
+
+          <article class="src-card">
+            <h3><span class="src-card__ico">📁</span> Berkas audio</h3>
+            <p>Putar berkas dari komputer. Analisis berjalan di atas elemen media, jadi durasi panjang tetap ringan.</p>
+            <label class="dropzone" id="dropzone">
+              <input id="file-input" type="file" accept="audio/*" hidden>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>
+              <span>Tarik berkas ke sini atau <b>pilih berkas</b></span>
+              <small>mp3 · wav · ogg · m4a</small>
+            </label>
+            <audio id="audio-el" controls preload="metadata"></audio>
+          </article>
+
+          <article class="src-card">
+            <h3><span class="src-card__ico">🎛️</span> Generator uji</h3>
+            <p>Nada sintetis tanpa input apa pun. Berguna untuk kalibrasi: sapuan frekuensi, denyut, dan derau.</p>
+            <div class="osc-row">
+              <select id="osc-type" aria-label="Bentuk gelombang">
+                <option value="sweep">Sapuan frekuensi</option>
+                <option value="pulse">Denyut ritmis</option>
+                <option value="noise">Derau</option>
+                <option value="chord">Akord</option>
+              </select>
+              <label class="slider slider--tight" for="osc-freq">
+                <span class="slider__name">Frekuensi <b id="val-osc-freq">220 Hz</b></span>
+                <input id="osc-freq" type="range" min="40" max="2000" step="10" value="220">
+              </label>
+            </div>
+            <button id="btn-osc" class="btn btn--outline btn--block" type="button">Jalankan generator</button>
+          </article>
+        </div>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="src-speech" aria-labelledby="tab-speech">
+        <div class="src-grid src-grid--2">
+          <article class="src-card">
+            <h3><span class="src-card__ico">🗣️</span> Ucapan langsung</h3>
+            <p>Rekognisi suara browser. Teks hasil dikenali dikirim ke mesin visual sebagai sinyal <em>fonem</em> — setiap kata memicu denyut.</p>
+            <button id="btn-speech" class="btn btn--primary btn--block" type="button">Mulai mendengarkan</button>
+            <p class="src-note" id="speech-note">Dukungan <span class="mono">SpeechRecognition</span> bergantung browser (terbaik di Chrome/Edge).</p>
+          </article>
+
+          <article class="src-card">
+            <h3><span class="src-card__ico">🔊</span> Ucapkan teks</h3>
+            <p>Ubah teks menjadi suara, lalu visualisasikan. Envelope ucapan buatan ini dipakai untuk menguji respons tanpa mikrofon.</p>
+            <textarea id="tts-text" rows="3" spellcheck="false">Unifier menyatukan audio, ucapan, dan sinyal agen menjadi satu panggung visual.</textarea>
+            <div class="osc-row">
+              <select id="tts-lang" aria-label="Bahasa ucapan">
+                <option value="id-ID">Indonesia</option>
+                <option value="en-US">English (US)</option>
+                <option value="ja-JP">日本語</option>
+              </select>
+              <button id="btn-tts" class="btn btn--outline" type="button">Ucapkan</button>
+            </div>
+          </article>
+        </div>
+
+        <div class="readout" id="speech-readout">
+          <div class="readout__main">
+            <span class="readout__label">Transkrip</span>
+            <p id="transcript" class="readout__text">— belum ada ucapan —</p>
+          </div>
+          <div class="readout__side">
+            <span class="readout__label">Sinyal fonem</span>
+            <div class="phoneme-strip" id="phoneme-strip" aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="src-agent" aria-labelledby="tab-agent">
+        <div class="src-grid src-grid--2">
+          <article class="src-card">
+            <h3><span class="src-card__ico">🤖</span> Simulasi agen</h3>
+            <p>Jalankan skenario siklus hidup agen AI. Setiap peristiwa punya “tanda tangan” visual sendiri.</p>
+            <div class="scenario-list" id="scenario-list">
+              <button type="button" class="scenario is-active" data-scenario="lifecycle">
+                <b>Siklus hidup</b><span>berpikir → alat → menjawab → selesai</span>
+              </button>
+              <button type="button" class="scenario" data-scenario="burst">
+                <b>Ledakan token</b><span>aliran keluaran cepat &amp; padat</span>
+              </button>
+              <button type="button" class="scenario" data-scenario="error">
+                <b>Galat &amp; pemulihan</b><span>kegagalan, lalu pulih</span>
+              </button>
+            </div>
+            <div class="osc-row">
+              <button id="btn-scenario" class="btn btn--primary" type="button">Putar skenario</button>
+              <button id="btn-scenario-stop" class="btn btn--ghost" type="button">Hentikan</button>
+            </div>
+          </article>
+
+          <article class="src-card">
+            <h3><span class="src-card__ico">🔌</span> Aliran langsung</h3>
+            <p>Hubungkan ke WebSocket yang memancarkan peristiwa JSON. Cocok untuk menyambung ke agen sungguhan.</p>
+            <div class="osc-row">
+              <input id="ws-url" type="url" placeholder="ws://localhost:8787/events" spellcheck="false">
+              <button id="btn-ws" class="btn btn--outline" type="button">Sambung</button>
+            </div>
+            <pre class="code" id="ws-sample">{ "type": "thinking", "intensity": 0.7 }
+{ "type": "tool", "name": "browser.search" }
+{ "type": "token", "text": "hasil" }
+{ "type": "error", "message": "timeout" }
+{ "type": "done" }</pre>
+            <p class="src-note">Server contoh: <span class="mono">node tools/ws-server.mjs</span></p>
+          </article>
+        </div>
+
+        <div class="event-log" id="event-log" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= CATATAN ============================= -->
+  <section class="panel panel--notes" id="catatan">
+    <header class="panel__head">
+      <h2>Catatan eksperimen</h2>
+      <p>Apa yang diuji, apa yang sengaja tidak dipakai, dan apa yang berikutnya.</p>
+    </header>
+
+    <div class="notes-grid">
+      <article>
+        <h3>Mengapa tanpa WebGL</h3>
+        <p>Semua gambar dilukis dengan Canvas 2D dan <span class="mono">requestAnimationFrame</span>. Tujuannya agar mesin bisa dibaca dan dimodifikasi di satu berkas, dan tetap jalan di perangkat tanpa GPU.</p>
+      </article>
+      <article>
+        <h3>Analisis yang dipakai</h3>
+        <p><span class="mono">AnalyserNode</span> dengan FFT 2048: magnitudo → dB → pita logaritmik, ditambah deteksi puncak dan deteksi ketukan dari energi pita rendah.</p>
+      </article>
+      <article>
+        <h3>Redaman temporal</h3>
+        <p>Nilai pita memakai serangan cepat / pelepasan lambat supaya batang tidak berkedip, sementara puncak punya peluruhan sendiri agar terbaca seperti VU meter.</p>
+      </article>
+      <article>
+        <h3>Peristiwa agen sebagai “instrumen”</h3>
+        <p><span class="mono">thinking</span> memicu denyut rendah, <span class="mono">tool</span> memicu kilatan, <span class="mono">token</span> menambah partikel, <span class="mono">error</span> memicu guncangan merah.</p>
+      </article>
+      <article>
+        <h3>Berikutnya</h3>
+        <p>Perekaman WebM langsung dari kanvas sudah ada. Langkah lanjut: peta peristiwa yang bisa dikonfigurasi, keluaran MIDI, dan modus dua kanal untuk kiri/kanan.</p>
+      </article>
+      <article>
+        <h3>Bagikan preset</h3>
+        <p>Setiap kontrol ditulis ke URL. Tombol <b>Bagikan</b> menyalin tautan yang membuka ulang panggung persis seperti yang Anda lihat.</p>
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="footer__left">
+    <span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+    <span><b>Unifier</b> · eksperimen visualisasi suara</span>
+  </div>
+  <div class="footer__right">
+    <span class="mono dim">Canvas 2D · Web Audio · tanpa dependensi</span>
+    <a href="https://github.com/antono4/VisualisasiSuaraReal-timeUnifier">Sumber</a>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="js/audio-engine.js"></script>
+<script src="js/sources.js"></script>
+<script src="js/visualizers.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
