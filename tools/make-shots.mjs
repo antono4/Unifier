@@ -114,11 +114,38 @@ async function main() {
   await page.screenshot({ path: join(OUT, "light.png") });
   written.push("light.png");
 
+  /* animated preview: grab raw canvas frames, assemble into an animated WebP.
+     A still cannot show a real-time visualizer doing anything, and there is no
+     ffmpeg here, so the frames come straight off the canvas. */
+  const FRAMES = 56;
+  const frameDir = join(OUT, "frames");
+  await mkdir(frameDir, { recursive: true });
+  await page.evaluate(() => {
+    window.__unifier.setTheme("dark");
+    window.__unifier.setMode("unified", false);
+    window.__unifier.setPalette("aurora");
+  });
+  await sleep(1200);
+  const frameW = 720;
+  for (let i = 0; i < FRAMES; i++) {
+    const dataUrl = await page.evaluate((w) => {
+      const src = document.getElementById("stage-canvas");
+      const off = document.createElement("canvas");
+      off.width = w;
+      off.height = Math.round((src.height / src.width) * w);
+      off.getContext("2d").drawImage(src, 0, 0, off.width, off.height);
+      return off.toDataURL("image/png");
+    }, frameW);
+    await writeFile(join(frameDir, `f${String(i).padStart(3, "0")}.png`), Buffer.from(dataUrl.split(",")[1], "base64"));
+    await sleep(90);
+  }
+  console.log(`wrote ${FRAMES} frames to .agent_tmp/shots/frames/`);
+
   await browser.close();
   server.close();
 
   for (const f of written) console.log("wrote .agent_tmp/shots/" + f);
-  console.log(`\n${written.length} shots. Now run: python3 tools/make_assets.py`);
+  console.log(`\n${written.length} shots + ${FRAMES} frames. Now run: python3 tools/make_assets.py`);
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });

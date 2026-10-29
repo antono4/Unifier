@@ -133,6 +133,35 @@ def icon(size: int) -> Image.Image:
     return img
 
 
+def make_animation() -> None:
+    """Assemble .agent_tmp/shots/frames/ into docs/preview.webp.
+
+    A still cannot show a real-time visualizer doing anything, and there is no
+    ffmpeg here, so the frames are collected off the canvas and stitched into an
+    animated WebP.
+
+    Every second frame is kept. This content is all fine detail and resists
+    compression, so frame count is the lever that actually matters: dropping
+    every other frame halves the file while keeping the same five seconds of
+    motion at 180 ms per frame, which is plenty for a preview loop.
+    """
+    src = ROOT / ".agent_tmp/shots/frames"
+    frames = sorted(src.glob("f*.png")) if src.is_dir() else []
+    if len(frames) < 2:
+        print("  (no frames; run tools/make-shots.mjs first)")
+        return
+    step = 2
+    imgs = [Image.open(p).convert("RGB") for p in frames[::step]]
+    out = ROOT / "docs"
+    out.mkdir(parents=True, exist_ok=True)
+    dest = out / "preview.webp"
+    imgs[0].save(
+        dest, "WEBP", save_all=True, append_images=imgs[1:],
+        duration=90 * step, loop=0, quality=68, method=6,
+    )
+    print(f"  wrote docs/preview.webp  {imgs[0].size}  {len(imgs)} frames  {dest.stat().st_size // 1024} KB")
+
+
 def optimise_shots() -> None:
     """Downscale .agent_tmp/shots/*.png into docs/ for the README.
 
@@ -169,6 +198,7 @@ def main() -> None:
         ic.save(ASSETS / f"icon-{s}.png", "PNG", optimize=True)
         print(f"  wrote assets/icon-{s}.png  {ic.size}")
     optimise_shots()
+    make_animation()
     print("done")
 
 

@@ -703,7 +703,9 @@ async function main() {
   /* docs/ is committed, so the images must be small enough to live in the repo */
   let imgBytes = 0;
   for (const rel of imgSrcs) { try { imgBytes += (await readFile(join(ROOT, rel))).length; } catch { /* counted as missing */ } }
-  check("README images stay lightweight (< 600 KB total)", imgBytes < 600 * 1024, (imgBytes / 1024).toFixed(0) + " KB");
+  /* docs/ is committed; the stills are small but the animated preview is not,
+     so the budget covers both and still catches an accidental 3 MB screenshot */
+  check("README images stay lightweight (< 1.5 MB total)", imgBytes < 1536 * 1024, (imgBytes / 1024).toFixed(0) + " KB");
 
   check("no console errors across the whole run", errors.length === 0, errors.slice(0, 4).join(" | "));
 

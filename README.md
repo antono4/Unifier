@@ -13,6 +13,10 @@ JavaScript, satu mesin analisis, enam renderer.
 
 <p align="center"><sub><i>Mode Unified berjalan di atas feed demo — tangkapan dari aplikasi yang sedang berjalan.</i></sub></p>
 
+<img src="docs/preview.webp" alt="Pratinjau bergerak: panggung Unifier bereaksi terhadap sinyal demo" width="100%">
+
+<p align="center"><sub><i>Pratinjau bergerak — diambil langsung dari kanvas, 28 bingkai. Visualisasi real-time tidak bisa ditunjukkan oleh gambar diam.</i></sub></p>
+
 ---
 
 ## Apa yang diuji
@@ -219,8 +223,8 @@ js/app.js                UI, loop RAF, HUD, perekam + ekspor PNG, status URL
 tools/build.py           build satu berkas + robots/sitemap/manifest
 tools/make_assets.py     kartu sosial + ikon (Pillow)
 tools/ws-server.mjs      feed peristiwa demo (WebSocket, tanpa dependensi)
-tools/make-shots.mjs     tangkapan layar README dari halaman yang berjalan
-docs/                    gambar README (WebP, diperkecil)
+tools/make-shots.mjs     tangkapan layar + bingkai animasi untuk README
+docs/                    gambar README (WebP statis + pratinjau bergerak)
 tools/test/smoke.mjs     108 pemeriksaan di Chromium sungguhan
 ```
 
