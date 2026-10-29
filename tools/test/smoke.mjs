@@ -81,6 +81,10 @@ async function canvasStats(page) {
     let lum = 0;
     let n = 0;
     let max = 0;
+    /* Mean hue, accumulated as a circular mean: summing raw degrees would put
+       the average of 350° and 10° at 180° instead of 0°. Only saturated pixels
+       count, since hue is meaningless on near-grey. */
+    let hx = 0, hy = 0, hn = 0;
     const seen = new Set();
     const stride = 4 * 7; // sample ~1/7 of pixels
     for (let i = 0; i < data.length; i += stride) {
@@ -91,12 +95,26 @@ async function canvasStats(page) {
       lum += l;
       n++;
       if (l > max) max = l;
+      const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+      const chroma = mx - mn;
+      if (chroma > 24 && mx > 40) {
+        let h;
+        if (mx === r) h = ((g - b) / chroma) % 6;
+        else if (mx === g) h = (b - r) / chroma + 2;
+        else h = (r - g) / chroma + 4;
+        const rad = (h * 60 * Math.PI) / 180;
+        hx += Math.cos(rad); hy += Math.sin(rad); hn++;
+      }
       seen.add(((r >> 3) << 10) | ((g >> 3) << 5) | (b >> 3));
+    }
+    let hue = -1;
+    if (hn) {
+      hue = ((Math.atan2(hy / hn, hx / hn) * 180) / Math.PI + 360) % 360;
     }
     return {
       w: c.width, h: c.height,
       meanLum: lum / n, maxLum: max,
-      colours: seen.size,
+      colours: seen.size, hue, hueSamples: hn,
     };
   });
 }
@@ -254,7 +272,7 @@ async function main() {
     check(`mode "${m}" updates HUD`, hudMode === m.toUpperCase());
     if (SHOTS) await page.screenshot({ path: join(OUT, `mode-${m}.png`) });
   }
-  const sigs = new Set(modes.map((m) => `${stats[m].colours}/${stats[m].meanLum.toFixed(1)}`));
+  const sigs = new Set(modes.map((m) => `${stats[m].colours}/${stats[m].meanLum.toFixed(1)}/${stats[m].hue.toFixed(0)}`));
   check("modes are visually distinct from each other", sigs.size === modes.length,
     `${sigs.size}/${modes.length} unique signatures`);
 
@@ -266,8 +284,15 @@ async function main() {
   await page.evaluate(() => window.__unifier.setPalette("ember"));
   await sleep(700);
   const ember = await canvasStats(page);
-  check("switching palette changes the frame", Math.abs(aurora.meanLum - ember.meanLum) > 0.5,
-    `aurora=${aurora.meanLum.toFixed(1)} ember=${ember.meanLum.toFixed(1)}`);
+  /* Compare hue, not brightness. aurora is teal/violet and ember is amber, but
+     the two can land on nearly the same mean luminance — a brightness check is
+     a weak proxy that passes or fails on animation timing. Hue separates them
+     by a wide, stable margin. */
+  const hueGap = Math.abs(((aurora.hue - ember.hue + 540) % 360) - 180);
+  check("palettes paint measurably different hues", hueGap > 15,
+    `aurora hue=${aurora.hue.toFixed(0)}° ember hue=${ember.hue.toFixed(0)}° gap=${hueGap.toFixed(0)}°`);
+  check("both palettes sample saturated pixels", aurora.hueSamples > 20 && ember.hueSamples > 20,
+    `aurora=${aurora.hueSamples} ember=${ember.hueSamples}`);
   const cssVar = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--s1").trim());
   check("palette writes through to CSS vars", cssVar === "#fbbf24", cssVar);
 

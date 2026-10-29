@@ -221,14 +221,14 @@ tools/make_assets.py     kartu sosial + ikon (Pillow)
 tools/ws-server.mjs      feed peristiwa demo (WebSocket, tanpa dependensi)
 tools/make-shots.mjs     tangkapan layar README dari halaman yang berjalan
 docs/                    gambar README (WebP, diperkecil)
-tools/test/smoke.mjs     107 pemeriksaan di Chromium sungguhan
+tools/test/smoke.mjs     108 pemeriksaan di Chromium sungguhan
 ```
 
 ## Pengujian
 
 ```bash
 npm i puppeteer-core
-node tools/test/smoke.mjs            # 107 pemeriksaan
+node tools/test/smoke.mjs            # 108 pemeriksaan
 node tools/test/smoke.mjs --shots    # + tangkapan layar ke .agent_tmp/
 ```
 
