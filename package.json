@@ -1,0 +1,20 @@
+{
+  "name": "unifier-visualizer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Unifier — real-time audio, speech and AI-agent signal visualization in Canvas 2D.",
+  "type": "commonjs",
+  "scripts": {
+    "serve": "python3 -m http.server 12000",
+    "ws": "node tools/ws-server.mjs",
+    "build": "python3 tools/build.py",
+    "assets": "python3 tools/make_assets.py",
+    "test": "node tools/test/smoke.mjs",
+    "test:shots": "node tools/test/smoke.mjs --shots"
+  },
+  "keywords": ["audio", "visualizer", "canvas", "web-audio", "fft", "speech", "agents"],
+  "license": "MIT",
+  "devDependencies": {
+    "puppeteer-core": "^25.16.0"
+  }
+}

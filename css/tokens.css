@@ -1,0 +1,96 @@
+/* Unifier — design tokens
+   Single source of truth for colour, type, space, motion, depth. */
+
+:root {
+  /* ---- palette (dark, default) ---- */
+  --bg: hsl(218 32% 5%);
+  --bg-soft: hsl(218 28% 8%);
+  --panel: hsl(218 24% 11%);
+  --panel-2: hsl(218 22% 14%);
+  --line: hsl(218 20% 20%);
+  --line-soft: hsl(218 20% 16%);
+  --text: hsl(210 30% 96%);
+  --text-dim: hsl(214 16% 68%);
+  /* 56% keeps ≥4.7:1 on the darkest panel it is ever painted on */
+  --text-mute: hsl(214 14% 56%);
+
+  --accent: hsl(170 68% 54%);
+  --accent-2: hsl(239 78% 70%);
+  --accent-3: hsl(330 78% 68%);
+  --accent-ink: hsl(218 40% 7%);
+
+  /* visualizer swatches (overridden by JS per palette) */
+  --s1: #2dd4bf;
+  --s2: #6366f1;
+  --s3: #f472b6;
+
+  /* ---- type ramp: exactly 9 steps ---- */
+  --t-2xs: 0.6875rem;
+  --t-xs: 0.75rem;
+  --t-sm: 0.8125rem;
+  --t-md: 0.9375rem;
+  --t-lg: 1.0625rem;
+  --t-xl: 1.375rem;
+  --t-2xl: 2rem;
+  --t-3xl: clamp(2.4rem, 5.2vw, 3.9rem);
+  --t-4xl: clamp(3rem, 7vw, 5rem);
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code", Menlo, Consolas, monospace;
+
+  /* ---- space ---- */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.5rem;
+  --sp-6: 2rem;
+  --sp-7: 3rem;
+  --sp-8: 4.5rem;
+
+  --radius-sm: 8px;
+  --radius: 14px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+
+  /* ---- depth: contact + ambient pair per level ---- */
+  --sh-1: 0 1px 1px hsl(218 40% 2% / 0.4), 0 2px 8px hsl(218 40% 2% / 0.28);
+  --sh-2: 0 1px 1px hsl(218 40% 2% / 0.45), 0 8px 24px hsl(218 40% 2% / 0.4);
+  --sh-3: 0 2px 2px hsl(218 40% 2% / 0.5), 0 18px 48px hsl(218 40% 2% / 0.52);
+  --sh-inset: inset 0 1px 0 hsl(210 40% 100% / 0.05);
+
+  /* ---- motion ---- */
+  --ease: cubic-bezier(0.32, 0.72, 0.28, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-1: 120ms;
+  --dur-2: 220ms;
+  --dur-3: 420ms;
+
+  --ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+}
+
+[data-theme="light"] {
+  --bg: hsl(210 34% 97%);
+  --bg-soft: hsl(210 30% 94%);
+  --panel: hsl(0 0% 100%);
+  --panel-2: hsl(210 30% 96.5%);
+  --line: hsl(214 22% 84%);
+  --line-soft: hsl(214 22% 89%);
+  --text: hsl(218 40% 12%);
+  --text-dim: hsl(216 18% 34%);
+  /* 42% keeps ≥5.2:1 on --panel-2, the lightest surface it sits on */
+  --text-mute: hsl(216 14% 42%);
+
+  /* dark enough for white ink at 5.06:1 — also fixes accent text on light panels */
+  --accent: hsl(174 74% 28%);
+  --accent-2: hsl(243 62% 46%);
+  --accent-3: hsl(330 66% 46%);
+  --accent-ink: hsl(0 0% 100%);
+
+  --sh-1: 0 1px 1px hsl(218 30% 40% / 0.14), 0 2px 6px hsl(218 30% 40% / 0.1);
+  --sh-2: 0 1px 1px hsl(218 30% 40% / 0.16), 0 8px 22px hsl(218 30% 40% / 0.14);
+  --sh-3: 0 2px 2px hsl(218 30% 40% / 0.18), 0 18px 44px hsl(218 30% 40% / 0.18);
+  --sh-inset: inset 0 1px 0 hsl(0 0% 100% / 0.7);
+
+  --ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+}

@@ -1,0 +1,19 @@
+{
+  "name": "Unifier \u2014 Visualisasi Suara Real-time",
+  "short_name": "Unifier",
+  "description": "Eksperimen visualisasi suara: audio, ucapan, dan sinyal agen AI menjadi efek visual.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#070b14",
+  "theme_color": "#070b14",
+  "lang": "id",
+  "icons": [
+    {
+      "src": "assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
